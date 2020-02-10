@@ -10,7 +10,7 @@ from tqdm import tqdm
 
 def argparser():
     parser = argparse.ArgumentParser(description='Skynet Model')
-    parser.add_argument('--batch-size', type=int, default=50, metavar='N',
+    parser.add_argument('--batch-size', type=int, default=25, metavar='N',
                         help='input batch size for training (default: 128)')
     parser.add_argument('--epochs', type=int, default=1, metavar='N',
                         help='number of epochs to train (default: 10)')
@@ -64,7 +64,7 @@ def run(args):
     num_workers = 4
     
     # Load data
-    train_dataset, test_dataset = dataset_factory(use_images=args.use_images, transform=transform, data_augment_angle=args.data_augmentation_angle) # No image folder means loading from hdf5 file
+    train_dataset, test_dataset = dataset_factory(use_images=args.use_images, transform=transform, data_augment_angle=args.data_augmentation_angle, image_folder='images/snap_dk_250_png') # No image folder means loading from hdf5 file
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=num_workers, drop_last=True)
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch_size, num_workers=num_workers, drop_last=False, shuffle=False)
 
