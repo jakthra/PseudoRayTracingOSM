@@ -1,0 +1,71 @@
+{
+    "config": {
+        "batch_size": 25,
+        "channels": 1,
+        "cuda": true,
+        "data_augmentation_angle": 20,
+        "epochs": 1,
+        "image_size": [
+            256,
+            256
+        ],
+        "kernel_size": [
+            [
+                5,
+                5
+            ],
+            [
+                3,
+                3
+            ],
+            [
+                3,
+                3
+            ],
+            [
+                3,
+                3
+            ],
+            [
+                2,
+                2
+            ],
+            [
+                2,
+                2
+            ]
+        ],
+        "lr": 0.003935836416731186,
+        "model_mode": "full",
+        "nn_layers": [
+            200,
+            200
+        ],
+        "no_cuda": false,
+        "no_data_augment": false,
+        "num_features": 9,
+        "offset_2630": -4,
+        "offset_811": 13,
+        "out_channels": [
+            10,
+            25,
+            10,
+            5,
+            5,
+            1
+        ],
+        "out_channels_l1": 10,
+        "seed": 1,
+        "use_images": true,
+        "weight_decay": 1e-05
+    },
+    "date": "2020-02-17 09:58:51.354592",
+    "results": {
+        "test_loss": [
+            0.10420630673851661
+        ],
+        "train_loss": [
+            0.09557237000101143
+        ]
+    }
+}

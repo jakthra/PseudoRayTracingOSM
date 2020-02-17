@@ -1,0 +1,11 @@
+program: train.py
+method: bayes
+metric:
+  name: val_loss
+  goal: minimize
+parameters:
+  lr:
+    min: 0.0001
+    max: 0.01
+  out-channels-l1:
+    values: [10, 20, 40, 60]

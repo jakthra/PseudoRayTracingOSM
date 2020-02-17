@@ -1,0 +1,23 @@
+  0%|                                                                                                                                                    | 0/2116 [00:00<?, ?it/s]
+Traceback (most recent call last):
+  File "train.py", line 172, in <module>
+    run(args)
+  File "train.py", line 147, in run
+    train(epoch)
+  File "train.py", line 103, in train
+    for idx, (feature, image, target, dist) in enumerate(train_loader):
+  File "C:\Users\jakob\Anaconda3\envs\pytorch\lib\site-packages\torch\utils\data\dataloader.py", line 193, in __iter__
+    return _DataLoaderIter(self)
+  File "C:\Users\jakob\Anaconda3\envs\pytorch\lib\site-packages\torch\utils\data\dataloader.py", line 469, in __init__
+    w.start()
+  File "C:\Users\jakob\Anaconda3\envs\pytorch\lib\multiprocessing\process.py", line 112, in start
+    self._popen = self._Popen(self)
+  File "C:\Users\jakob\Anaconda3\envs\pytorch\lib\multiprocessing\context.py", line 223, in _Popen
+    return _default_context.get_context().Process._Popen(process_obj)
+  File "C:\Users\jakob\Anaconda3\envs\pytorch\lib\multiprocessing\context.py", line 322, in _Popen
+    return Popen(process_obj)
+  File "C:\Users\jakob\Anaconda3\envs\pytorch\lib\multiprocessing\popen_spawn_win32.py", line 89, in __init__
+    reduction.dump(process_obj, to_child)
+  File "C:\Users\jakob\Anaconda3\envs\pytorch\lib\multiprocessing\reduction.py", line 60, in dump
+    ForkingPickler(file, protocol).dump(obj)
+BrokenPipeError: [Errno 32] Broken pipe

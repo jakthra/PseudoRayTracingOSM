@@ -7,12 +7,13 @@ from torch import nn
 from torch.optim import lr_scheduler
 from experimentlogger import Experiment
 from tqdm import tqdm
+import wandb
 
 def argparser():
     parser = argparse.ArgumentParser(description='Skynet Model')
     parser.add_argument('--batch-size', type=int, default=25, metavar='N',
                         help='input batch size for training (default: 128)')
-    parser.add_argument('--epochs', type=int, default=1, metavar='N',
+    parser.add_argument('--epochs', type=int, default=200, metavar='N',
                         help='number of epochs to train (default: 10)')
     parser.add_argument('--no-cuda', action='store_true', default=False,
                         help='enables CUDA training')
@@ -24,7 +25,7 @@ def argparser():
     parser.add_argument('--no-data-augment',action='store_true', default=False,
                         help='disables data augmentation')
     parser.add_argument('--data-augmentation-angle',type=float, default=20)
-    parser.add_argument('--out-channels-l1', type=int, default=200)
+    parser.add_argument('--out-channels-l1', type=int, default=50)
     parser.add_argument('--offset-811', type=int, default=13)
     parser.add_argument('--offset-2630', type=int, default=-4)
     
@@ -34,6 +35,7 @@ def argparser():
 
 def run(args):
     
+  
     
     args.cuda = not args.no_cuda and torch.cuda.is_available()
 
@@ -71,7 +73,7 @@ def run(args):
     # Instansiate model
     args.num_features = train_dataset.features.shape[1]+1
     args.image_size = [256, 256]
-    args.out_channels = [int(args.out_channels_l1), 100, 50, 25, 12, 1]
+    args.out_channels = [int(args.out_channels_l1), 25, 10, 5, 5, 1]
     args.kernel_size = [(5,5), (3,3), (3,3), (3,3), (2,2), (2,2)]
     args.nn_layers = [200, 200]
     args.channels = 1
@@ -84,6 +86,8 @@ def run(args):
     if args.cuda:
         model.cuda()
     
+    wandb.init(project="osm_pseudo_raytracing", config=args)
+    wandb.watch(model)
     # Define loss function, optimizer and LR scheduler
     criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
@@ -144,6 +148,7 @@ def run(args):
         model.eval()
         test(epoch)
         scheduler_model.step(test_loss[-1])
+        wandb.log({"test_loss: ": test_loss[-1], "train_loss": train_loss[-1]})
         print("Epoch: {}, train_loss: {}, test_loss: {}".format(epoch, train_loss[-1], test_loss[-1]))
 
         if optimizer.param_groups[0]['lr'] < 1e-7:
