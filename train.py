@@ -28,6 +28,8 @@ def argparser():
     parser.add_argument('--out-channels-l1', type=int, default=50)
     parser.add_argument('--offset-811', type=int, default=13)
     parser.add_argument('--offset-2630', type=int, default=-4)
+    parser.add_argument('--nn_layer_size', type=int, default=200)
+    parser.add_argument('--kernel_size_l1', type=int, default=5)
     
     args = parser.parse_args()
     return args
@@ -74,8 +76,8 @@ def run(args):
     args.num_features = train_dataset.features.shape[1]+1
     args.image_size = [256, 256]
     args.out_channels = [int(args.out_channels_l1), 25, 10, 5, 5, 1]
-    args.kernel_size = [(5,5), (3,3), (3,3), (3,3), (2,2), (2,2)]
-    args.nn_layers = [200, 200]
+    args.kernel_size = [(int(args.kernel_size_l1),int(args.kernel_size_l1)), (3,3), (3,3), (3,3), (2,2), (2,2)]
+    args.nn_layers = [int(args.nn_layer_size), int(args.nn_layer_size)]
     args.channels = 1
 
     rsrp_mu = train_dataset.target_mu
@@ -148,7 +150,7 @@ def run(args):
         model.eval()
         test(epoch)
         scheduler_model.step(test_loss[-1])
-        wandb.log({"test_loss: ": test_loss[-1], "train_loss": train_loss[-1]})
+        wandb.log({"test_loss": test_loss[-1], "train_loss": train_loss[-1]})
         print("Epoch: {}, train_loss: {}, test_loss: {}".format(epoch, train_loss[-1], test_loss[-1]))
 
         if optimizer.param_groups[0]['lr'] < 1e-7:

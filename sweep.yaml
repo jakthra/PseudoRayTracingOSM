@@ -1,7 +1,7 @@
 program: train.py
 method: bayes
 metric:
-  name: val_loss
+  name: test_loss
   goal: minimize
 parameters:
   lr:
@@ -9,3 +9,10 @@ parameters:
     max: 0.01
   out-channels-l1:
     values: [10, 20, 40, 60]
+  nn_layer_size:
+    values: [8, 32, 64, 128, 256]
+  kernel_size_l1:
+    values: [2, 3, 5]
+  data-augmentation-angle:
+    min: 1
+    max: 30

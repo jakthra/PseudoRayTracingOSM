@@ -19,9 +19,10 @@
         "agent",
         "1eux1mp3"
     ],
-    "state": "running",
+    "state": "finished",
     "jobType": null,
     "mode": "run",
     "project": "osm_pseudo_raytracing",
-    "heartbeatAt": "2020-02-17T10:22:47.518849"
+    "heartbeatAt": "2020-02-17T11:53:27.168198",
+    "exitcode": 0
 }

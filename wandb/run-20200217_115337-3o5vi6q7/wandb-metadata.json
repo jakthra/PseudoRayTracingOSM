@@ -1,0 +1,27 @@
+{
+    "root": "E:/OSM_Images_Skynet",
+    "program": "C:\\Users\\jakob\\Anaconda3\\envs\\pytorch\\Scripts\\wandb.exe\\__main__.py",
+    "git": {
+        "remote": "git@github.com:jakthra/PseudoRayTracingOSM.git",
+        "commit": "120a88ba8106c7cb444d8df2c91d23c9c5b10fc6"
+    },
+    "email": "jathr@fotonik.dtu.dk",
+    "startedAt": "2020-02-17T11:53:44.406034",
+    "host": "FTNK-Thrane-net",
+    "username": "jakob",
+    "executable": "c:\\users\\jakob\\anaconda3\\envs\\pytorch\\python.exe",
+    "os": "Windows-10-10.0.15063-SP0",
+    "python": "3.7.3",
+    "gpu": "GeForce GTX 1080 Ti",
+    "gpu_count": 2,
+    "cpu_count": 12,
+    "args": [
+        "agent",
+        "1eux1mp3"
+    ],
+    "state": "running",
+    "jobType": null,
+    "mode": "run",
+    "project": "osm_pseudo_raytracing",
+    "heartbeatAt": "2020-02-17T13:30:21.151851"
+}
