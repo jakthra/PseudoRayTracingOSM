@@ -3,7 +3,6 @@ from torch import nn
 import torch
 import matplotlib.pyplot as plt
 from dataset_factory import dataset_factory
-import matplotlib2tikz
 from pathloss_38901 import pathloss_38901
 import numpy as np
 
