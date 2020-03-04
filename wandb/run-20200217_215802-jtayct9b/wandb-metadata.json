@@ -1,0 +1,29 @@
+{
+    "root": "/home/jakob/Git/PseudoRayTracingOSM",
+    "program": "/home/jakob/.conda/envs/pseudoraytracing/bin/wandb",
+    "git": {
+        "remote": "https://github.com/jakthra/PseudoRayTracingOSM",
+        "commit": "120a88ba8106c7cb444d8df2c91d23c9c5b10fc6"
+    },
+    "email": null,
+    "startedAt": "2020-02-17T21:58:07.561143",
+    "host": "deathstar",
+    "username": "jakob",
+    "executable": "/home/jakob/.conda/envs/pseudoraytracing/bin/python",
+    "os": "Linux-4.15.0-76-generic-x86_64-with-debian-buster-sid",
+    "python": "3.7.6",
+    "gpu": "GeForce RTX 2080 Ti",
+    "gpu_count": 2,
+    "cpu_count": 16,
+    "cuda": "10.1.105",
+    "args": [
+        "agent",
+        "1eux1mp3"
+    ],
+    "state": "finished",
+    "jobType": null,
+    "mode": "run",
+    "project": "osm_pseudo_raytracing",
+    "heartbeatAt": "2020-02-17T22:44:56.302093",
+    "exitcode": 0
+}

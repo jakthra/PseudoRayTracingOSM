@@ -1,0 +1,17 @@
+  0%|                                                  | 0/2116 [00:00<?, ?it/s]  0%|                                                  | 0/2116 [00:00<?, ?it/s]
+Traceback (most recent call last):
+  File "train.py", line 172, in <module>
+    run(args)
+  File "train.py", line 147, in run
+    train(epoch)
+  File "train.py", line 112, in train
+    output, sum_output = model(feature, image, dist)
+  File "/home/jakob/.conda/envs/pseudoraytracing/lib/python3.7/site-packages/torch/nn/modules/module.py", line 532, in __call__
+    result = self.forward(*input, **kwargs)
+  File "/home/jakob/Git/PseudoRayTracingOSM/model.py", line 130, in forward
+    P = self.predict_physicals_model(features, distance)
+  File "/home/jakob/Git/PseudoRayTracingOSM/model.py", line 169, in predict_physicals_model
+    frequency, offset = self.get_constants(features, distance)
+  File "/home/jakob/Git/PseudoRayTracingOSM/model.py", line 216, in get_constants
+    offset[features[:,7] == 1] = torch.tensor(self.offset_2630)
+RuntimeError: expected dtype Float but got dtype Long

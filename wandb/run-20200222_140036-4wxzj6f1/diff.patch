@@ -1,0 +1,95 @@
+diff --git a/__pycache__/dataset_factory.cpython-37.pyc b/__pycache__/dataset_factory.cpython-37.pyc
+index b554315..74907ca 100644
+Binary files a/__pycache__/dataset_factory.cpython-37.pyc and b/__pycache__/dataset_factory.cpython-37.pyc differ
+diff --git a/__pycache__/model.cpython-37.pyc b/__pycache__/model.cpython-37.pyc
+index 1369068..b5adc3b 100644
+Binary files a/__pycache__/model.cpython-37.pyc and b/__pycache__/model.cpython-37.pyc differ
+diff --git a/__pycache__/pathloss_38901.cpython-37.pyc b/__pycache__/pathloss_38901.cpython-37.pyc
+index 35dc677..3a094ab 100644
+Binary files a/__pycache__/pathloss_38901.cpython-37.pyc and b/__pycache__/pathloss_38901.cpython-37.pyc differ
+diff --git a/dataset_factory.py b/dataset_factory.py
+index d7c0260..e27c949 100644
+--- a/dataset_factory.py
++++ b/dataset_factory.py
+@@ -16,16 +16,16 @@ def dataset_factory(use_images=True, image_folder="images/snap_dk_250_png", tran
+      # ['SINR', 'RSRP', 'RSRQ', 'Power']	
+     selected_targets = [1]
+     dataset_path='dataset' 
+-    features = np.load("{}\\training_features.npy".format(dataset_path))
+-    targets = np.load("{}\\training_targets.npy".format(dataset_path))
+-    test_features =  np.load("{}\\test_features.npy".format(dataset_path))
+-    test_targets = np.load("{}\\test_targets.npy".format(dataset_path))    
+-    target_mu = np.load("{}\\targets_mu.npy".format(dataset_path))    
+-    target_std = np.load("{}\\targets_std.npy".format(dataset_path))    
+-    features_mu = np.load("{}\\features_mu.npy".format(dataset_path))    
+-    features_std = np.load("{}\\features_std.npy".format(dataset_path))
+-    images = np.load("{}\\train_image_idx.npy".format(dataset_path))
+-    test_images = np.load("{}\\test_image_idx.npy".format(dataset_path))
++    features = np.load("{}/training_features.npy".format(dataset_path))
++    targets = np.load("{}/training_targets.npy".format(dataset_path))
++    test_features =  np.load("{}/test_features.npy".format(dataset_path))
++    test_targets = np.load("{}/test_targets.npy".format(dataset_path))    
++    target_mu = np.load("{}/targets_mu.npy".format(dataset_path))    
++    target_std = np.load("{}/targets_std.npy".format(dataset_path))    
++    features_mu = np.load("{}/features_mu.npy".format(dataset_path))    
++    features_std = np.load("{}/features_std.npy".format(dataset_path))
++    images = np.load("{}/train_image_idx.npy".format(dataset_path))
++    test_images = np.load("{}/test_image_idx.npy".format(dataset_path))
+ 
+     
+     features = features[:, selected_features]
+@@ -109,4 +109,4 @@ if __name__ == '__main__':
+ 
+     fig = plt.figure(figsize=(5,5))
+     plt.imshow(data[1].permute(1,2,0).numpy())
+-    plt.show()
+\ No newline at end of file
++    plt.show()
+diff --git a/model.py b/model.py
+index 94eda36..f0035ac 100644
+--- a/model.py
++++ b/model.py
+@@ -212,8 +212,8 @@ class SkynetModel(nn.Module):
+         offset = torch.empty((distance.shape))
+         frequency[features[:,7] == 1] = torch.tensor(2.63)
+         frequency[features[:,7] != 1] = torch.tensor(0.811)
+-        offset[features[:,7] == 1] = torch.tensor(self.offset_2630)
+-        offset[features[:,7] != 1] = torch.tensor(self.offset_811)
++        offset[features[:,7] == 1] = torch.tensor(self.offset_2630).float()
++        offset[features[:,7] != 1] = torch.tensor(self.offset_811).float()
+         return frequency, offset
+ 
+     def MSE_physicsmodel(self, distance, targets):
+diff --git a/sweep.yaml b/sweep.yaml
+index 94b8754..f4d9a6f 100644
+--- a/sweep.yaml
++++ b/sweep.yaml
+@@ -8,11 +8,14 @@ parameters:
+     min: 0.0001
+     max: 0.01
+   out-channels-l1:
+-    values: [10, 20, 40, 60]
++    values: [16, 32, 64, 128]
+   nn_layer_size:
+-    values: [8, 32, 64, 128, 256]
++    values: [64, 128, 256]
+   kernel_size_l1:
+-    values: [2, 3, 5]
++    values: [4, 6, 8, 10]
+   data-augmentation-angle:
+     min: 1
+-    max: 30
+\ No newline at end of file
++    max: 30
++  weight-decay:
++    min: 0.00001
++    max: 0.01
+diff --git a/utils/__pycache__/__init__.cpython-37.pyc b/utils/__pycache__/__init__.cpython-37.pyc
+index b648965..02fab75 100644
+Binary files a/utils/__pycache__/__init__.cpython-37.pyc and b/utils/__pycache__/__init__.cpython-37.pyc differ
+diff --git a/utils/__pycache__/invert.cpython-37.pyc b/utils/__pycache__/invert.cpython-37.pyc
+index f065bb2..c3fb8dd 100644
+Binary files a/utils/__pycache__/invert.cpython-37.pyc and b/utils/__pycache__/invert.cpython-37.pyc differ
+diff --git a/wandb/debug.log b/wandb/debug.log
+index 0bff47e..76bf661 100644
+Binary files a/wandb/debug.log and b/wandb/debug.log differ

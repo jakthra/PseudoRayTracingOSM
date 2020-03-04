@@ -1,0 +1,23 @@
+wandb_version: 1
+
+_wandb:
+  desc: null
+  value:
+    cli_version: 0.8.27
+    is_jupyter_run: false
+    python_version: 3.7.6
+data-augmentation-angle:
+  desc: null
+  value: 18
+kernel_size_l1:
+  desc: null
+  value: 3
+lr:
+  desc: null
+  value: 0.004716324924620327
+nn_layer_size:
+  desc: null
+  value: 8
+out-channels-l1:
+  desc: null
+  value: 20

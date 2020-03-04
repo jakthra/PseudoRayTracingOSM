@@ -1,0 +1,188 @@
+diff --git a/__pycache__/dataset_factory.cpython-37.pyc b/__pycache__/dataset_factory.cpython-37.pyc
+index b554315..f420ced 100644
+Binary files a/__pycache__/dataset_factory.cpython-37.pyc and b/__pycache__/dataset_factory.cpython-37.pyc differ
+diff --git a/__pycache__/model.cpython-37.pyc b/__pycache__/model.cpython-37.pyc
+index 1369068..b5adc3b 100644
+Binary files a/__pycache__/model.cpython-37.pyc and b/__pycache__/model.cpython-37.pyc differ
+diff --git a/__pycache__/pathloss_38901.cpython-37.pyc b/__pycache__/pathloss_38901.cpython-37.pyc
+index 35dc677..3a094ab 100644
+Binary files a/__pycache__/pathloss_38901.cpython-37.pyc and b/__pycache__/pathloss_38901.cpython-37.pyc differ
+diff --git a/dataset_factory.py b/dataset_factory.py
+index d7c0260..e4aa518 100644
+--- a/dataset_factory.py
++++ b/dataset_factory.py
+@@ -16,16 +16,16 @@ def dataset_factory(use_images=True, image_folder="images/snap_dk_250_png", tran
+      # ['SINR', 'RSRP', 'RSRQ', 'Power']	
+     selected_targets = [1]
+     dataset_path='dataset' 
+-    features = np.load("{}\\training_features.npy".format(dataset_path))
+-    targets = np.load("{}\\training_targets.npy".format(dataset_path))
+-    test_features =  np.load("{}\\test_features.npy".format(dataset_path))
+-    test_targets = np.load("{}\\test_targets.npy".format(dataset_path))    
+-    target_mu = np.load("{}\\targets_mu.npy".format(dataset_path))    
+-    target_std = np.load("{}\\targets_std.npy".format(dataset_path))    
+-    features_mu = np.load("{}\\features_mu.npy".format(dataset_path))    
+-    features_std = np.load("{}\\features_std.npy".format(dataset_path))
+-    images = np.load("{}\\train_image_idx.npy".format(dataset_path))
+-    test_images = np.load("{}\\test_image_idx.npy".format(dataset_path))
++    features = np.load("{}/training_features.npy".format(dataset_path))
++    targets = np.load("{}/training_targets.npy".format(dataset_path))
++    test_features =  np.load("{}/test_features.npy".format(dataset_path))
++    test_targets = np.load("{}/test_targets.npy".format(dataset_path))    
++    target_mu = np.load("{}/targets_mu.npy".format(dataset_path))    
++    target_std = np.load("{}/targets_std.npy".format(dataset_path))    
++    features_mu = np.load("{}/features_mu.npy".format(dataset_path))    
++    features_std = np.load("{}/features_std.npy".format(dataset_path))
++    images = np.load("{}/train_image_idx.npy".format(dataset_path))
++    test_images = np.load("{}/test_image_idx.npy".format(dataset_path))
+ 
+     
+     features = features[:, selected_features]
+@@ -44,7 +44,7 @@ def dataset_factory(use_images=True, image_folder="images/snap_dk_250_png", tran
+     # Data augmentation
+     if transform:
+         #composed = transforms.Compose([transforms.ToPILImage(), transforms.Grayscale(), transforms.RandomAffine(data_augment_angle, shear=10), transforms.ToTensor()])
+-        composed = transforms.Compose([transforms.ToPILImage(),  transforms.Grayscale(), Invert(), transforms.RandomAffine(data_augment_angle, shear=10), transforms.ToTensor()])
++        composed = transforms.Compose([transforms.ToPILImage(),  transforms.Grayscale(), transforms.RandomAffine(data_augment_angle, shear=10), transforms.ToTensor()])
+     else:
+         composed = None
+     
+@@ -109,4 +109,4 @@ if __name__ == '__main__':
+ 
+     fig = plt.figure(figsize=(5,5))
+     plt.imshow(data[1].permute(1,2,0).numpy())
+-    plt.show()
+\ No newline at end of file
++    plt.show()
+diff --git a/model.py b/model.py
+index 94eda36..f0035ac 100644
+--- a/model.py
++++ b/model.py
+@@ -212,8 +212,8 @@ class SkynetModel(nn.Module):
+         offset = torch.empty((distance.shape))
+         frequency[features[:,7] == 1] = torch.tensor(2.63)
+         frequency[features[:,7] != 1] = torch.tensor(0.811)
+-        offset[features[:,7] == 1] = torch.tensor(self.offset_2630)
+-        offset[features[:,7] != 1] = torch.tensor(self.offset_811)
++        offset[features[:,7] == 1] = torch.tensor(self.offset_2630).float()
++        offset[features[:,7] != 1] = torch.tensor(self.offset_811).float()
+         return frequency, offset
+ 
+     def MSE_physicsmodel(self, distance, targets):
+diff --git a/sweep.yaml b/sweep.yaml
+index 94b8754..35b64b0 100644
+--- a/sweep.yaml
++++ b/sweep.yaml
+@@ -8,11 +8,16 @@ parameters:
+     min: 0.0001
+     max: 0.01
+   out-channels-l1:
+-    values: [10, 20, 40, 60]
++    values: [32, 64, 128]
++  out_channel_l2:
++    values: [12, 32, 64]  
+   nn_layer_size:
+-    values: [8, 32, 64, 128, 256]
++    values: [128, 256, 384]
+   kernel_size_l1:
+-    values: [2, 3, 5]
++    values: [5, 8, 10]
+   data-augmentation-angle:
+     min: 1
+-    max: 30
+\ No newline at end of file
++    max: 30
++  weight-decay:
++    min: 0.00001
++    max: 0.01
+diff --git a/train.py b/train.py
+index a128cc8..efbbe21 100644
+--- a/train.py
++++ b/train.py
+@@ -26,6 +26,7 @@ def argparser():
+                         help='disables data augmentation')
+     parser.add_argument('--data-augmentation-angle',type=float, default=20)
+     parser.add_argument('--out-channels-l1', type=int, default=50)
++    parser.add_argument('--out_channels_l2', type=int, default=25)
+     parser.add_argument('--offset-811', type=int, default=13)
+     parser.add_argument('--offset-2630', type=int, default=-4)
+     parser.add_argument('--nn_layer_size', type=int, default=200)
+@@ -75,8 +76,9 @@ def run(args):
+     # Instansiate model
+     args.num_features = train_dataset.features.shape[1]+1
+     args.image_size = [256, 256]
+-    args.out_channels = [int(args.out_channels_l1), 25, 10, 5, 5, 1]
+-    args.kernel_size = [(int(args.kernel_size_l1),int(args.kernel_size_l1)), (3,3), (3,3), (3,3), (2,2), (2,2)]
++    #args.out_channels = [int(args.out_channels_l1), 25, 10, 5, 5, 1]
++    args.out_channels = [int(args.out_channels_l1), int(args.out_channels_l2), 10, 5, 1]    
++    args.kernel_size = [(int(args.kernel_size_l1),int(args.kernel_size_l1)), (3,3), (3,3), (3,3), (2,2)]
+     args.nn_layers = [int(args.nn_layer_size), int(args.nn_layer_size)]
+     args.channels = 1
+ 
+@@ -172,4 +174,4 @@ def run(args):
+ if __name__ == '__main__':
+     args = argparser()
+     run(args)
+-    
+\ No newline at end of file
++    
+diff --git a/utils/__pycache__/__init__.cpython-37.pyc b/utils/__pycache__/__init__.cpython-37.pyc
+index b648965..02fab75 100644
+Binary files a/utils/__pycache__/__init__.cpython-37.pyc and b/utils/__pycache__/__init__.cpython-37.pyc differ
+diff --git a/utils/__pycache__/invert.cpython-37.pyc b/utils/__pycache__/invert.cpython-37.pyc
+index f065bb2..c3fb8dd 100644
+Binary files a/utils/__pycache__/invert.cpython-37.pyc and b/utils/__pycache__/invert.cpython-37.pyc differ
+diff --git a/wandb/debug.log b/wandb/debug.log
+index 0bff47e..e4981dd 100644
+--- a/wandb/debug.log
++++ b/wandb/debug.log
+@@ -1,26 +1,22 @@
+-2020-02-19 10:04:53,954 DEBUG   MainThread:8944 [wandb_config.py:_load_defaults():119] no defaults not found in config-defaults.yaml
+-2020-02-19 10:04:53,977 DEBUG   MainThread:8944 [meta.py:setup():94] code probe starting
+-2020-02-19 10:04:53,977 DEBUG   MainThread:8944 [meta.py:setup():98] non time limited probe of code
+-2020-02-19 10:04:54,004 DEBUG   MainThread:8944 [util.py:is_cygwin_git():319] Failed checking if running in CYGWIN due to: FileNotFoundError(2, 'The system cannot find the file specified', None, 2, None)
+-2020-02-19 10:04:54,005 DEBUG   MainThread:8944 [meta.py:_setup_code_git():49] probe for git information
+-2020-02-19 10:04:54,007 DEBUG   MainThread:8944 [cmd.py:execute():722] Popen(['git', 'cat-file', '--batch-check'], cwd=E:\OSM_Images_Skynet, universal_newlines=False, shell=None)
+-2020-02-19 10:04:54,082 DEBUG   MainThread:8944 [cmd.py:execute():722] Popen(['git', 'rev-parse', '--show-toplevel'], cwd=E:\OSM_Images_Skynet, universal_newlines=False, shell=None)
+-2020-02-19 10:04:54,160 DEBUG   MainThread:8944 [meta.py:_setup_code_program():58] scan for untracked program
+-2020-02-19 10:04:54,161 DEBUG   MainThread:8944 [cmd.py:execute():722] Popen(['git', 'status', '--porcelain', '--untracked-files'], cwd=E:\OSM_Images_Skynet, universal_newlines=False, shell=None)
+-2020-02-19 10:04:54,255 DEBUG   MainThread:8944 [meta.py:setup():116] code probe done
+-2020-02-19 10:04:54,264 DEBUG   MainThread:8944 [run_manager.py:__init__():536] Initialized sync for osm_pseudo_raytracing/cjq74pgz
+-2020-02-19 10:04:54,270 INFO    MainThread:8944 [run_manager.py:wrap_existing_process():1134] wrapping existing process 19052
+-2020-02-19 10:04:54,272 DEBUG   MainThread:8944 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): pypi.org:443
+-2020-02-19 10:04:54,339 DEBUG   MainThread:8944 [connectionpool.py:_make_request():396] https://pypi.org:443 "GET /pypi/wandb/json HTTP/1.1" 200 41171
+-2020-02-19 10:04:54,367 INFO    MainThread:8944 [run_manager.py:init_run():919] system metrics and metadata threads started
+-2020-02-19 10:04:54,367 INFO    MainThread:8944 [run_manager.py:init_run():953] upserting run before process can begin, waiting at most 10 seconds
+-2020-02-19 10:04:54,385 DEBUG   Thread-20 :8944 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-20202020-02-19 10:04:58,709 DEBUG   MainThread:20896 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-19 10:04:58,960 DEBUG   MainThread:20896 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-19 10:05:03,971 DEBUG   MainThread:20896 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-19 10:05:04,198 DEBUG   MainThread:20896 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-19 10:05:09,207 DEBUG   MainThread:20896 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-19 10:05:09,778 DEBUG   MainThread:20896 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-19 10:05:14,784 DEBUG   MainThread:20896 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-19 10:05:15,000 DEBUG   MainThread:20896 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-19 10:05:20,005 DEBUG   MainThread:20896 [connectionpool.py:_ne
+\ No newline at end of file
++2020-02-26 09:51:28,122 DEBUG   MainThread:10512 [wandb_config.py:_load_defaults():119] no defaults not found in config-defaults.yaml
++2020-02-26 09:51:28,129 DEBUG   MainThread:10512 [meta.py:setup():94] code probe starting
++2020-02-26 09:51:28,129 DEBUG   MainThread:10512 [meta.py:_setup_code_git():49] probe for git information
++2020-02-26 09:51:28,130 DEBUG   MainThread:10512 [cmd.py:execute():719] Popen(['git', 'cat-file', '--batch-check'], cwd=/home/jakob/Git/PseudoRayTracingOSM, universal_newlines=False, shell=None, istream=<valid stream>)
++2020-02-26 09:51:28,140 DEBUG   MainThread:10512 [cmd.py:execute():719] Popen(['git', 'rev-parse', '--show-toplevel'], cwd=/home/jakob/Git/PseudoRayTracingOSM, universal_newlines=False, shell=None, istream=None)
++2020-02-26 09:51:28,147 DEBUG   MainThread:10512 [meta.py:_setup_code_program():58] scan for untracked program
++2020-02-26 09:51:28,147 DEBUG   MainThread:10512 [cmd.py:execute():719] Popen(['git', 'status', '--porcelain', '--untracked-files'], cwd=/home/jakob/Git/PseudoRayTracingOSM, universal_newlines=False, shell=None, istream=None)
++2020-02-26 09:51:28,173 DEBUG   MainThread:10512 [meta.py:setup():116] code probe done
++2020-02-26 09:51:28,185 DEBUG   MainThread:10512 [run_manager.py:__init__():536] Initialized sync for osm_pseudo_raytracing/w26qa4z5
++2020-02-26 09:51:28,192 INFO    MainThread:10512 [run_manager.py:wrap_existing_process():1134] wrapping existing process 10494
++2020-02-26 09:51:28,193 WARNING MainThread:10512 [io_wrap.py:register():104] SIGWINCH handler was not None: <Handlers.SIG_DFL: 0>
++2020-02-26 09:51:28,198 DEBUG   MainThread:10512 [connectionpool.py:_new_conn():959] Starting new HTTPS connection (1): pypi.org:443
++2020-02-26 09:51:28,261 DEBUG   MainThread:10512 [connectionpool.py:_make_request():437] https://pypi.org:443 "GET /pypi/wandb/json HTTP/1.1" 200 41454
++2020-02-26 09:51:28,292 INFO    MainThread:10512 [run_manager.py:init_run():919] system metrics and metadata threads started
++2020-02-26 09:51:28,292 INFO    MainThread:10512 [run_manager.py:init_run():953] upserting run before process can begin, waiting at most 10 seconds
++2020-02-26 09:51:28,311 DEBUG   Thread-14 :10512 [connectionpool.py:_new_conn():959] Starting new HTTPS connection (1): api.wandb.ai:443
++2020-02-26 09:51:28,562 DEBUG   Thread-14 :10512 [connectionpool.py:_make_request():437] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 None
++2020-02-26 09:51:28,576 INFO    Thread-14 :10512 [run_manager.py:_upsert_run():1038] saving patches
++2020-02-26 09:51:28,577 DEBUG   Thread-14 :10512 [cmd.py:execute():719] Popen(['git', 'rev-parse', '--show-toplevel'], cwd=/home/jakob/Git/PseudoRayTracingOSM, universal_newlines=False, shell=None, istream=None)
++2020-02-26 09:51:28,587 DEBUG   Thread-14 :10512 [cmd.py:execute():719] Popen(['git', 'diff', '--cached', '--abbrev=40', '--full-index', '--raw'], cwd=/home/jakob/Git/PseudoRayTracingOSM, universal_newlines=False, shell=None, istream=None)
++2020-02-26 09:51:28,599 DEBUG   Thread-14 :10512 [cmd.py:execute():719] Popen(['git', 'diff', '--abbrev=40', '--full-index', '--raw'], cwd=/home/jakob/Git/PseudoRayTracingOSM, universal_newlines=False, shell=None, istream=None)
++2020-02-26 09:51:28,614 DEBUG   Thread-14 :10512 [cmd.py:execute():719] Popen(['git', 'version'], cwd=/home/jakob/Git/PseudoRayTracingOSM, universal_newlines=False, shell=None, istream=None)

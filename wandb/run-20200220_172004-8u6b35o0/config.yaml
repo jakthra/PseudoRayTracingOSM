@@ -1,0 +1,106 @@
+wandb_version: 1
+
+_wandb:
+  desc: null
+  value:
+    cli_version: 0.8.27
+    framework: torch
+    is_jupyter_run: false
+    python_version: 3.7.6
+batch_size:
+  desc: null
+  value: 25
+channels:
+  desc: null
+  value: 1
+cuda:
+  desc: null
+  value: true
+data-augmentation-angle:
+  desc: null
+  value: 7
+data_augmentation_angle:
+  desc: null
+  value: 7.0
+epochs:
+  desc: null
+  value: 200
+image_size:
+  desc: null
+  value:
+  - 256
+  - 256
+kernel_size:
+  desc: null
+  value:
+  - - 4
+    - 4
+  - - 3
+    - 3
+  - - 3
+    - 3
+  - - 3
+    - 3
+  - - 2
+    - 2
+  - - 2
+    - 2
+kernel_size_l1:
+  desc: null
+  value: 4
+lr:
+  desc: null
+  value: 0.000546670720109651
+model_mode:
+  desc: null
+  value: full
+nn_layer_size:
+  desc: null
+  value: 64
+nn_layers:
+  desc: null
+  value:
+  - 64
+  - 64
+no_cuda:
+  desc: null
+  value: false
+no_data_augment:
+  desc: null
+  value: false
+num_features:
+  desc: null
+  value: 9
+offset_2630:
+  desc: null
+  value: -4
+offset_811:
+  desc: null
+  value: 13
+out-channels-l1:
+  desc: null
+  value: 64
+out_channels:
+  desc: null
+  value:
+  - 64
+  - 25
+  - 10
+  - 5
+  - 5
+  - 1
+out_channels_l1:
+  desc: null
+  value: 64
+seed:
+  desc: null
+  value: 1
+use_images:
+  desc: null
+  value: true
+weight-decay:
+  desc: null
+  value: 0.0008558588728832656
+weight_decay:
+  desc: null
+  value: 0.0008558588728832656

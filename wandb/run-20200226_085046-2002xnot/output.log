@@ -1,0 +1,23 @@
+  0%|                                                  | 0/2116 [00:00<?, ?it/s]  0%|                                                  | 0/2116 [00:00<?, ?it/s]
+Traceback (most recent call last):
+  File "train.py", line 176, in <module>
+    run(args)
+  File "train.py", line 151, in run
+    train(epoch)
+  File "train.py", line 116, in train
+    output, sum_output = model(feature, image, dist)
+  File "/home/jakob/.conda/envs/pseudoraytracing/lib/python3.7/site-packages/torch/nn/modules/module.py", line 532, in __call__
+    result = self.forward(*input, **kwargs)
+  File "/home/jakob/Git/PseudoRayTracingOSM/model.py", line 140, in forward
+    I = self.ImageModel(image)
+  File "/home/jakob/.conda/envs/pseudoraytracing/lib/python3.7/site-packages/torch/nn/modules/module.py", line 532, in __call__
+    result = self.forward(*input, **kwargs)
+  File "/home/jakob/Git/PseudoRayTracingOSM/model.py", line 40, in forward
+    x = self.Z(x)
+  File "/home/jakob/.conda/envs/pseudoraytracing/lib/python3.7/site-packages/torch/nn/modules/module.py", line 532, in __call__
+    result = self.forward(*input, **kwargs)
+  File "/home/jakob/.conda/envs/pseudoraytracing/lib/python3.7/site-packages/torch/nn/modules/linear.py", line 87, in forward
+    return F.linear(input, self.weight, self.bias)
+  File "/home/jakob/.conda/envs/pseudoraytracing/lib/python3.7/site-packages/torch/nn/functional.py", line 1370, in linear
+    ret = torch.addmm(bias, input, weight.t())
+RuntimeError: size mismatch, m1: [25 x 36], m2: [49 x 49] at /opt/conda/conda-bld/pytorch_1579022060824/work/aten/src/THC/generic/THCTensorMathBlas.cu:290

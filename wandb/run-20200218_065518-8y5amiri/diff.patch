@@ -1,0 +1,581 @@
+diff --git a/__pycache__/dataset_factory.cpython-37.pyc b/__pycache__/dataset_factory.cpython-37.pyc
+index b554315..42f0537 100644
+Binary files a/__pycache__/dataset_factory.cpython-37.pyc and b/__pycache__/dataset_factory.cpython-37.pyc differ
+diff --git a/__pycache__/model.cpython-37.pyc b/__pycache__/model.cpython-37.pyc
+index 1369068..080ecf7 100644
+Binary files a/__pycache__/model.cpython-37.pyc and b/__pycache__/model.cpython-37.pyc differ
+diff --git a/__pycache__/pathloss_38901.cpython-37.pyc b/__pycache__/pathloss_38901.cpython-37.pyc
+index 35dc677..3a094ab 100644
+Binary files a/__pycache__/pathloss_38901.cpython-37.pyc and b/__pycache__/pathloss_38901.cpython-37.pyc differ
+diff --git a/dataset_factory.py b/dataset_factory.py
+index d7c0260..e27c949 100644
+--- a/dataset_factory.py
++++ b/dataset_factory.py
+@@ -16,16 +16,16 @@ def dataset_factory(use_images=True, image_folder="images/snap_dk_250_png", tran
+      # ['SINR', 'RSRP', 'RSRQ', 'Power']	
+     selected_targets = [1]
+     dataset_path='dataset' 
+-    features = np.load("{}\\training_features.npy".format(dataset_path))
+-    targets = np.load("{}\\training_targets.npy".format(dataset_path))
+-    test_features =  np.load("{}\\test_features.npy".format(dataset_path))
+-    test_targets = np.load("{}\\test_targets.npy".format(dataset_path))    
+-    target_mu = np.load("{}\\targets_mu.npy".format(dataset_path))    
+-    target_std = np.load("{}\\targets_std.npy".format(dataset_path))    
+-    features_mu = np.load("{}\\features_mu.npy".format(dataset_path))    
+-    features_std = np.load("{}\\features_std.npy".format(dataset_path))
+-    images = np.load("{}\\train_image_idx.npy".format(dataset_path))
+-    test_images = np.load("{}\\test_image_idx.npy".format(dataset_path))
++    features = np.load("{}/training_features.npy".format(dataset_path))
++    targets = np.load("{}/training_targets.npy".format(dataset_path))
++    test_features =  np.load("{}/test_features.npy".format(dataset_path))
++    test_targets = np.load("{}/test_targets.npy".format(dataset_path))    
++    target_mu = np.load("{}/targets_mu.npy".format(dataset_path))    
++    target_std = np.load("{}/targets_std.npy".format(dataset_path))    
++    features_mu = np.load("{}/features_mu.npy".format(dataset_path))    
++    features_std = np.load("{}/features_std.npy".format(dataset_path))
++    images = np.load("{}/train_image_idx.npy".format(dataset_path))
++    test_images = np.load("{}/test_image_idx.npy".format(dataset_path))
+ 
+     
+     features = features[:, selected_features]
+@@ -109,4 +109,4 @@ if __name__ == '__main__':
+ 
+     fig = plt.figure(figsize=(5,5))
+     plt.imshow(data[1].permute(1,2,0).numpy())
+-    plt.show()
+\ No newline at end of file
++    plt.show()
+diff --git a/model.py b/model.py
+index bc52147..4b18953 100644
+--- a/model.py
++++ b/model.py
+@@ -3,7 +3,7 @@ from torch import nn
+ import torch
+ import matplotlib.pyplot as plt
+ from dataset_factory import dataset_factory
+-import matplotlib2tikz
++#import matplotlib2tikz
+ from pathloss_38901 import pathloss_38901
+ import numpy as np
+ 
+@@ -213,8 +213,8 @@ class SkynetModel(nn.Module):
+         offset = torch.empty((distance.shape))
+         frequency[features[:,7] == 1] = torch.tensor(2.63)
+         frequency[features[:,7] != 1] = torch.tensor(0.811)
+-        offset[features[:,7] == 1] = torch.tensor(self.offset_2630)
+-        offset[features[:,7] != 1] = torch.tensor(self.offset_811)
++        offset[features[:,7] == 1] = torch.tensor(self.offset_2630).float()
++        offset[features[:,7] != 1] = torch.tensor(self.offset_811).float()
+         return frequency, offset
+ 
+     def MSE_physicsmodel(self, distance, targets):
+diff --git a/utils/__pycache__/__init__.cpython-37.pyc b/utils/__pycache__/__init__.cpython-37.pyc
+index b648965..02fab75 100644
+Binary files a/utils/__pycache__/__init__.cpython-37.pyc and b/utils/__pycache__/__init__.cpython-37.pyc differ
+diff --git a/utils/__pycache__/invert.cpython-37.pyc b/utils/__pycache__/invert.cpython-37.pyc
+index f065bb2..c3fb8dd 100644
+Binary files a/utils/__pycache__/invert.cpython-37.pyc and b/utils/__pycache__/invert.cpython-37.pyc differ
+diff --git a/wandb/debug.log b/wandb/debug.log
+index 9d7b642..acbf289 100644
+--- a/wandb/debug.log
++++ b/wandb/debug.log
+@@ -1,477 +1,22 @@
+-2020-02-17 10:59:18,344 DEBUG   MainThread:21260 [wandb_config.py:_load_defaults():119] no defaults not found in config-defaults.yaml
+-2020-02-17 10:59:18,379 DEBUG   MainThread:21260 [meta.py:setup():94] code probe starting
+-2020-02-17 10:59:18,379 DEBUG   MainThread:21260 [meta.py:setup():98] non time limited probe of code
+-2020-02-17 10:59:18,406 DEBUG   MainThread:21260 [util.py:is_cygwin_git():319] Failed checking if running in CYGWIN due to: FileNotFoundError(2, 'The system cannot find the file specified', None, 2, None)
+-2020-02-17 10:59:18,408 DEBUG   MainThread:21260 [meta.py:_setup_code_git():49] probe for git information
+-2020-02-17 10:59:18,410 DEBUG   MainThread:21260 [cmd.py:execute():722] Popen(['git', 'cat-file', '--batch-check'], cwd=E:\OSM_Images_Skynet, universal_newlines=False, shell=None)
+-2020-02-17 10:59:18,517 DEBUG   MainThread:21260 [cmd.py:execute():722] Popen(['git', 'rev-parse', '--show-toplevel'], cwd=E:\OSM_Images_Skynet, universal_newlines=False, shell=None)
+-2020-02-17 10:59:18,620 DEBUG   MainThread:21260 [meta.py:_setup_code_program():58] scan for untracked program
+-2020-02-17 10:59:18,620 DEBUG   MainThread:21260 [cmd.py:execute():722] Popen(['git', 'status', '--porcelain', '--untracked-files'], cwd=E:\OSM_Images_Skynet, universal_newlines=False, shell=None)
+-2020-02-17 10:59:18,732 DEBUG   MainThread:21260 [meta.py:setup():116] code probe done
+-2020-02-17 10:59:18,740 DEBUG   MainThread:21260 [run_manager.py:__init__():536] Initialized sync for osm_pseudo_raytracing/nbv51tui
+-2020-02-17 10:59:18,745 INFO    MainThread:21260 [run_manager.py:wrap_existing_process():1134] wrapping existing process 19828
+-2020-02-17 10:59:18,748 DEBUG   MainThread:21260 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): pypi.org:443
+-2020-02-17 10:59:18,800 DEBUG   MainThread:21260 [connectionpool.py:_make_request():396] https://pypi.org:443 "GET /2020-02-17 10:59:20,576 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 10:59:20,872 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 10:59:25,876 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 10:59:26,167 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 10:59:31,173 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 10:59:31,454 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 10:59:36,459 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 10:59:36,827 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 10:59:41,831 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 10:59:42,146 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 10:59:47,151 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 10:59:47,448 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 10:59:52,453 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 10:59:52,802 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 10:59:57,809 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 10:59:58,139 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:00:03,143 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:00:03,471 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:00:08,476 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:00:08,767 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:00:13,772 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:00:14,085 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:00:19,093 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:00:19,352 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:00:24,356 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:00:24,722 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:00:29,727 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:00:30,044 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:00:35,050 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:00:35,440 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:00:40,447 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:00:40,750 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:00:45,754 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:00:46,089 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:00:51,095 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:00:51,387 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:00:56,392 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:00:56,717 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:01:01,721 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:01:02,027 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:01:07,031 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:01:07,397 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:01:12,402 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:01:12,686 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:01:17,691 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:01:17,975 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:01:22,980 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:01:23,291 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:01:28,298 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:01:28,577 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:01:33,582 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:01:33,840 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:01:38,844 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:01:39,144 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:01:44,148 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:01:44,437 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:01:49,443 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:01:49,797 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:01:54,803 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:01:55,151 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:02:00,156 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:02:00,535 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:02:05,541 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:02:05,824 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:02:10,829 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:02:11,147 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:02:16,152 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:02:16,485 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:02:21,493 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:02:21,902 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:02:26,910 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:02:27,231 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:02:32,237 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:02:32,496 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:02:37,504 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:02:37,831 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:02:42,837 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:02:43,147 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:02:48,155 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:02:48,468 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:02:53,472 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:02:53,805 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:02:58,809 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:02:59,113 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:03:04,118 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:03:04,619 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:03:09,625 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:03:09,924 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:03:14,929 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:03:15,201 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 2020-02-17 11:03:19,751 INFO    T2020-02-17 11:03:20,207 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:032020-02-17 11:03:23,759 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\2020-02-17 11:03:25,516 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:03:25,792 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 2020-02-17 11:03:35,777 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:03:51,805 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:03:54,039 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:03:54,803 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:03:54,809 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-events.jsonl
+-2020-02-17 11:04:07,831 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:04:23,855 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:04:25,055 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:04:25,819 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:04:25,857 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-events.jsonl
+-2020-02-17 11:04:39,878 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:04:55,904 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:04:55,905 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-events.jsonl
+-2020-02-17 11:04:56,055 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:04:56,856 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:05:11,927 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:05:26,891 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:05:26,949 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-events.jsonl
+-2020-02-17 11:05:27,953 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:05:43,996 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:05:49,006 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-history.jsonl
+-2020-02-17 11:05:49,007 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-summary.json
+-2020-02-17 11:05:58,030 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-events.jsonl
+-2020-02-17 11:05:58,078 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:05:59,032 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:06:15,058 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:06:28,329 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:06:28,945 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:06:29,079 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-events.jsonl
+-2020-02-17 11:06:31,082 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:06:47,108 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:06:59,203 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:06:59,882 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:07:00,125 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-events.jsonl
+-2020-02-17 11:07:03,128 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:07:19,151 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:07:30,145 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:07:30,170 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-events.jsonl
+-2020-02-17 11:07:30,931 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:07:35,178 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:07:51,200 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:08:00,975 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:08:01,214 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-events.jsonl
+-2020-02-17 11:08:07,224 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:08:23,249 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:08:31,206 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:08:31,978 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:08:32,261 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-events.jsonl
+-2020-02-17 11:08:39,283 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:08:55,318 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:08:59,326 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-history.jsonl
+-2020-02-17 11:08:59,326 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-summary.json
+-2020-02-17 11:09:02,336 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-events.jsonl
+-2020-02-17 11:09:03,136 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:09:11,366 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:09:27,390 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:09:33,398 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-events.jsonl
+-2020-02-17 11:09:33,449 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:09:33,997 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:09:43,414 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:09:59,438 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:10:04,275 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:10:04,446 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-events.jsonl
+-2020-02-17 11:10:05,035 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:10:15,460 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:10:31,486 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:10:35,020 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:10:35,490 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-events.jsonl
+-2020-02-17 11:10:47,509 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:11:03,535 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:11:05,286 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:11:05,537 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-events.jsonl
+-2020-02-17 11:11:06,055 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:11:19,555 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:11:35,579 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:11:36,292 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:11:36,581 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-events.jsonl
+-2020-02-17 11:11:37,091 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:11:51,616 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:12:07,406 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:12:07,641 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-history.jsonl
+-2020-02-17 11:12:07,642 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-summary.json
+-2020-02-17 11:12:07,645 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:12:07,646 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-events.jsonl
+-2020-02-17 11:12:23,677 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:12:38,216 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:12:38,699 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-events.jsonl
+-2020-02-17 11:12:39,700 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:12:55,722 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:13:08,662 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:13:08,741 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-events.jsonl
+-2020-02-17 11:13:11,745 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:13:27,768 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:13:39,087 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:13:39,784 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-events.jsonl
+-2020-02-17 11:13:43,789 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:13:59,811 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:14:10,115 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:14:10,827 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-events.jsonl
+-2020-02-17 11:14:15,834 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:14:31,857 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:14:40,869 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-events.jsonl
+-2020-02-17 11:14:41,128 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:14:47,877 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:15:03,921 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:15:11,401 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:15:11,933 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-events.jsonl
+-2020-02-17 11:15:13,939 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-history.jsonl
+-2020-02-17 11:15:13,940 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-summary.json
+-2020-02-17 11:15:19,959 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:15:35,996 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:15:43,005 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-events.jsonl
+-2020-02-17 11:15:43,371 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:15:52,019 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:16:08,039 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:16:13,607 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:16:14,052 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-events.jsonl
+-2020-02-17 11:16:14,223 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:16:24,066 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:16:40,086 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:16:44,093 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-events.jsonl
+-2020-02-17 11:16:44,259 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:16:56,112 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:17:12,140 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:17:14,497 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:17:15,144 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-events.jsonl
+-2020-02-17 11:17:15,240 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:17:28,162 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:17:44,187 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:17:45,499 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:17:46,190 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-events.jsonl
+-2020-02-17 11:17:46,403 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:18:00,209 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:18:16,251 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:18:16,644 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:18:17,253 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-events.jsonl
+-2020-02-17 11:18:17,323 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:18:23,265 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-history.jsonl
+-2020-02-17 11:18:23,266 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-summary.json
+-2020-02-17 11:18:32,292 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:18:47,319 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-events.jsonl
+-2020-02-17 11:18:48,321 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:18:48,432 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:19:04,346 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:19:18,325 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:19:18,368 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-events.jsonl
+-2020-02-17 11:19:20,371 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:19:36,396 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:19:48,604 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:19:49,315 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:19:49,413 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-events.jsonl
+-2020-02-17 11:19:51,416 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:20:07,438 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:20:19,459 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-events.jsonl
+-2020-02-17 11:20:19,581 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:20:20,353 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:20:23,464 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:20:39,488 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:20:50,506 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-events.jsonl
+-2020-02-17 11:20:50,623 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:20:51,382 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:20:55,515 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:21:11,539 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:21:21,381 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:21:21,553 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-events.jsonl
+-2020-02-17 11:21:27,564 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:21:35,576 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-history.jsonl
+-2020-02-17 11:21:35,576 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-summary.json
+-2020-02-17 11:21:43,590 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:21:52,563 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:21:52,602 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-events.jsonl
+-2020-02-17 11:21:59,613 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:22:15,638 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:22:22,869 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:22:23,458 DEBUG   Thread-13 :21260 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /files/jathr/osm_pseudo_raytracing/nbv51tui/file_stream HTTP/1.1" 200 311
+-2020-02-17 11:22:23,649 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-events.jsonl
+-2020-02-17 11:22:31,663 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-2020-02-17 11:22:47,687 INFO    Thread-7  :21260 [run_manager.py:_on_file_modified():683] file/dir modified: E:\OSM_Images_Skynet\wandb\run-20200217_095910-nbv51tui\wandb-metadata.json
+-02-17 11:13:59,465 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:14:04,470 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:14:04,795 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:14:09,800 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:14:10,103 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:14:15,108 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:14:15,434 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:14:20,439 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:14:20,761 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:14:25,769 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:14:26,055 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:14:31,060 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:14:31,380 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:14:36,384 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:14:36,683 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:14:41,688 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:14:42,007 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:14:47,014 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:14:47,358 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:14:52,366 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:14:52,668 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:14:57,678 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:14:57,990 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:15:02,997 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:15:03,324 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:15:08,329 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:15:08,711 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:15:13,720 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:15:14,033 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:15:19,041 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:15:19,412 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:15:24,423 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:15:24,751 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:15:29,758 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:15:30,072 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:15:35,077 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:15:35,364 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:15:40,373 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:15:40,658 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:15:45,665 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:15:46,020 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:15:51,026 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:15:51,357 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:15:56,362 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:15:56,667 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:16:01,671 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:16:01,963 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:16:06,967 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:16:07,319 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:16:12,324 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:16:12,623 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:16:17,630 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:16:17,915 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:16:22,920 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:16:23,238 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:16:28,244 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:16:28,589 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:16:33,597 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:16:33,897 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:16:38,904 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:16:39,216 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:16:44,221 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:16:44,555 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:16:49,562 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:16:49,871 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:16:54,875 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:16:55,171 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:17:00,178 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:17:00,457 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:17:05,462 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:17:05,759 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:17:10,765 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:17:11,081 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:17:16,086 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:17:16,358 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:17:21,363 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:17:21,711 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:17:26,717 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:17:27,022 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:17:32,026 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:17:32,350 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:17:37,355 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:17:37,675 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:17:42,681 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:17:43,001 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:17:48,007 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:17:48,291 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:17:53,295 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:17:53,606 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:17:58,611 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:17:58,930 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:18:03,940 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:18:04,291 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:18:09,302 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:18:09,635 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:18:14,640 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:18:14,947 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:18:19,952 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:18:20,279 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:18:25,290 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:18:25,675 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:18:30,686 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:18:31,022 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:18:36,027 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:18:36,344 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:18:41,353 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:18:41,666 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:18:46,674 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:18:47,023 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:18:52,028 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:18:52,351 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:18:57,355 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:18:57,667 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:19:02,671 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:19:02,974 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:19:07,978 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:19:08,284 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:19:13,290 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:19:13,570 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:19:18,575 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:19:18,890 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:19:23,895 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:19:24,222 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:19:29,227 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:19:29,518 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:19:34,524 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:19:34,869 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:19:39,876 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:19:40,190 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:19:45,195 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:19:45,531 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:19:50,536 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:19:50,827 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:19:55,832 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:19:56,129 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:20:01,133 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:20:01,448 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:20:06,452 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:20:06,744 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:20:11,748 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:20:12,022 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:20:17,026 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:20:17,322 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:20:22,329 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:20:22,696 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:20:27,700 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:20:28,053 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:20:33,060 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:20:33,406 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:20:38,412 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:20:38,758 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:20:43,767 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:20:44,097 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:20:49,104 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:20:49,543 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:20:54,548 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:20:54,902 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:20:59,908 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:21:00,259 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:21:05,265 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:21:05,617 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:21:10,625 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:21:11,019 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:21:16,025 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:21:16,371 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:21:21,375 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:21:21,710 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:21:26,715 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:21:27,098 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:21:32,104 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:21:32,446 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:21:37,451 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:21:37,826 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:21:42,830 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:21:43,150 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:21:48,156 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:21:48,507 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:21:53,511 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:21:53,893 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:21:58,898 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:21:59,211 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:22:04,216 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:22:04,562 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:22:09,567 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:22:09,874 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:22:14,879 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:22:15,230 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:22:20,234 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:22:20,613 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:22:25,619 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:22:25,960 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:22:30,965 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:22:31,317 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
+-2020-02-17 11:22:36,323 DEBUG   MainThread:4244 [connectionpool.py:_new_conn():815] Starting new HTTPS connection (1): api.wandb.ai:443
+-2020-02-17 11:22:36,686 DEBUG   MainThread:4244 [connectionpool.py:_make_request():396] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 58
++2020-02-18 07:55:25,032 DEBUG   MainThread:22309 [wandb_config.py:_load_defaults():119] no defaults not found in config-defaults.yaml
++2020-02-18 07:55:25,041 DEBUG   MainThread:22309 [meta.py:setup():94] code probe starting
++2020-02-18 07:55:25,042 DEBUG   MainThread:22309 [meta.py:_setup_code_git():49] probe for git information
++2020-02-18 07:55:25,043 DEBUG   MainThread:22309 [cmd.py:execute():719] Popen(['git', 'cat-file', '--batch-check'], cwd=/home/jakob/Git/PseudoRayTracingOSM, universal_newlines=False, shell=None, istream=<valid stream>)
++2020-02-18 07:55:25,052 DEBUG   MainThread:22309 [cmd.py:execute():719] Popen(['git', 'rev-parse', '--show-toplevel'], cwd=/home/jakob/Git/PseudoRayTracingOSM, universal_newlines=False, shell=None, istream=None)
++2020-02-18 07:55:25,059 DEBUG   MainThread:22309 [meta.py:_setup_code_program():58] scan for untracked program
++2020-02-18 07:55:25,059 DEBUG   MainThread:22309 [cmd.py:execute():719] Popen(['git', 'status', '--porcelain', '--untracked-files'], cwd=/home/jakob/Git/PseudoRayTracingOSM, universal_newlines=False, shell=None, istream=None)
++2020-02-18 07:55:25,073 DEBUG   MainThread:22309 [meta.py:setup():116] code probe done
++2020-02-18 07:55:25,083 DEBUG   MainThread:22309 [run_manager.py:__init__():536] Initialized sync for osm_pseudo_raytracing/8y5amiri
++2020-02-18 07:55:25,090 INFO    MainThread:22309 [run_manager.py:wrap_existing_process():1134] wrapping existing process 22296
++2020-02-18 07:55:25,090 WARNING MainThread:22309 [io_wrap.py:register():104] SIGWINCH handler was not None: <Handlers.SIG_DFL: 0>
++2020-02-18 07:55:25,096 DEBUG   MainThread:22309 [connectionpool.py:_new_conn():959] Starting new HTTPS connection (1): pypi.org:443
++2020-02-18 07:55:25,164 DEBUG   MainThread:22309 [connectionpool.py:_make_request():437] https://pypi.org:443 "GET /pypi/wandb/json HTTP/1.1" 200 41171
++2020-02-18 07:55:25,197 INFO    MainThread:22309 [run_manager.py:init_run():919] system metrics and metadata threads started
++2020-02-18 07:55:25,197 INFO    MainThread:22309 [run_manager.py:init_run():953] upserting run before process can begin, waiting at most 10 seconds
++2020-02-18 07:55:25,217 DEBUG   Thread-14 :22309 [connectionpool.py:_new_conn():959] Starting new HTTPS connection (1): api.wandb.ai:443
++2020-02-18 07:55:25,454 DEBUG   Thread-14 :22309 [connectionpool.py:_make_request():437] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 662
++2020-02-18 07:55:25,468 INFO    Thread-14 :22309 [run_manager.py:_upsert_run():1038] saving patches
++2020-02-18 07:55:25,469 DEBUG   Thread-14 :22309 [cmd.py:execute():719] Popen(['git', 'rev-parse', '--show-toplevel'], cwd=/home/jakob/Git/PseudoRayTracingOSM, universal_newlines=False, shell=None, istream=None)
++2020-02-18 07:55:25,480 DEBUG   Thread-14 :22309 [cmd.py:execute():719] Popen(['git', 'diff', '--cached', '--abbrev=40', '--full-index', '--raw'], cwd=/home/jakob/Git/PseudoRayTracingOSM, universal_newlines=False, shell=None, istream=None)
++2020-02-18 07:55:25,492 DEBUG   Thread-14 :22309 [cmd.py:execute():719] Popen(['git', 'diff', '--abbrev=40', '--full-index', '--raw'], cwd=/home/jakob/Git/PseudoRayTracingOSM, universal_newlines=False, shell=None, istream=None)
++2020-02-18 07:55:25,506 DEBUG   Thread-14 :22309 [cmd.py:execute():719] Popen(['git', 'version'], cwd=/home/jakob/Git/PseudoRayTracingOSM, universal_newlines=False, shell=None, istream=None)
