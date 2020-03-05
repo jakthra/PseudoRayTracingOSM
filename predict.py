@@ -131,8 +131,8 @@ def run(args):
 
     # Store predictions
     np.save(results_folder_path+"/correction.npy", correction)
-    np.save(results_folder_path+"/sum_output.npy", correction)
-    np.save(results_folder_path+"/pathloss_model.npy", correction)
+    np.save(results_folder_path+"/sum_output.npy", sum_output)
+    np.save(results_folder_path+"/pathloss_model.npy", P)
 
 
 

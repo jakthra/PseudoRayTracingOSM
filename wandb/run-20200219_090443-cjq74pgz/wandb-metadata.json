@@ -19,9 +19,10 @@
         "agent",
         "v3gigkuk"
     ],
-    "state": "running",
+    "state": "finished",
     "jobType": null,
     "mode": "run",
     "project": "osm_pseudo_raytracing",
-    "heartbeatAt": "2020-02-19T09:06:14.412633"
+    "heartbeatAt": "2020-02-19T11:23:46.344171",
+    "exitcode": 0
 }
