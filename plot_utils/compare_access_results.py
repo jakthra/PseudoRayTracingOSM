@@ -1,9 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import json
 
 
-
-def model_comparison_barplot_labels(MSE_811, MSE_2630, std_811, std_2630, labels, name='model_comparison_bar_group_std_split'):
+def model_comparison_barplot_labels(MSE_811, MSE_2630, std_811, std_2630, labels, name='model_comparison_access'):
     x = np.arange(len(labels))
     width = 0.35
 
@@ -19,4 +19,26 @@ def model_comparison_barplot_labels(MSE_811, MSE_2630, std_811, std_2630, labels
         plt.tight_layout()
         plt.grid()
         plt.savefig('results/{}.eps'.format(name))
+        plt.savefig('results/{}.png'.format(name))
         plt.show()
+
+
+if __name__ == "__main__":
+
+    access_model_name = '63b17fa0-89e0-440b-952c-aa7f2e63e49c'
+    with open("results/evaluations/"+access_model_name+"_results.json") as file:
+        access_model = json.load(file)
+
+
+    model_name = '20ca9ba4-64ef-45a8-8a42-0f1308d9cdce'
+    with open("results/evaluations/"+model_name+"_results.json") as file:
+        results_model = json.load(file)
+
+    MSE_811 = results_model['RMSE_811']
+    MSE_2630 = results_model['RMSE_2630']
+
+    MSE_811_access = access_model['RMSE_811']
+    MSE_2630_access = access_model['RMSE_2630']
+
+    model_comparison_barplot_labels([MSE_811, MSE_811_access], [MSE_2630, MSE_2630_access], [0, 0], [0, 0], ['OSM picture', 'Satellite images'])
+

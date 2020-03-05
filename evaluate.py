@@ -138,6 +138,7 @@ def run(args):
         plt.ylabel('Frequency')
         plt.legend()
         plt.savefig('results/rsrp_correction_hist_{}.eps'.format(args.name))
+        plt.savefig('results/rsrp_correction_hist_{}.png'.format(args.name))
         plt.show()
 
     def cdf_hist_plot(target, predicted, theoretical, mhz):
@@ -150,6 +151,7 @@ def run(args):
         plt.xlabel('RSRP [dBm]')
         plt.tight_layout()
         plt.savefig('results/cdf_{}_{}mhz.eps'.format(args.name, mhz))
+        plt.savefig('results/cdf_{}_{}mhz.png'.format(args.name, mhz))
         plt.show()
 
     def hist_plot(target, predicted, theoretical, mhz):

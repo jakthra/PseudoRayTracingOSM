@@ -69,6 +69,7 @@ class DrivetestDataset(Dataset):
         self.use_images = use_images
         self.image_folder = image_folder
         self.transform = transform
+        self.image_size = io.imread(os.path.join(self.image_folder, "{}.png".format(0))).shape
 
     def get_811Mhz_idx(self):
         return np.argwhere(np.asarray(self.features[:,7] != 1))
@@ -93,6 +94,8 @@ class DrivetestDataset(Dataset):
         y = torch.from_numpy(self.targets[index]).float() # Target
         dist = torch.abs(torch.tensor(self.distances[index])).float().view(1) # Unormalized distance
         dist = dist * 1000 # to meters
+
+
 
         if self.use_images:
             if self.transform:
