@@ -5,3 +5,5 @@ dataset/
 snap_dk_250.zip
 images/
 dortmund_images/
+*.zip
+*.pyc
