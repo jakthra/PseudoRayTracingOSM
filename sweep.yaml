@@ -4,18 +4,12 @@ metric:
   name: test_loss
   goal: minimize
 parameters:
-  lr:
-    min: 0.0001
-    max: 0.01
   out_channels_l1:
     values: [32, 64, 128]
   out_channels_l2:
     values: [12, 32, 64]  
   kernel_size_l1:
     values: [5, 8, 10]
-  data_augmentation_angle:
-    min: 1
-    max: 30
   weight_decay:
     min: 0.00001
     max: 0.01

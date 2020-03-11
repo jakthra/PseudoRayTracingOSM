@@ -19,9 +19,10 @@
         "agent",
         "jathr/osm_pseudo_raytracing/9qtzttov"
     ],
-    "state": "running",
+    "state": "finished",
     "jobType": null,
     "mode": "run",
     "project": "osm_pseudo_raytracing",
-    "heartbeatAt": "2020-03-05T10:26:30.020557"
+    "heartbeatAt": "2020-03-05T13:27:52.952488",
+    "exitcode": 0
 }

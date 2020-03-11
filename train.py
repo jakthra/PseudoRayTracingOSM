@@ -69,15 +69,15 @@ def run(args):
     num_workers = 4
     
     # Load data
-    train_dataset, test_dataset = dataset_factory(use_images=args.use_images, transform=transform, data_augment_angle=args.data_augmentation_angle, image_folder='images/snap_dk_250_png') # No image folder means loading from hdf5 file
+    train_dataset, test_dataset = dataset_factory(use_images=args.use_images, transform=transform, data_augment_angle=args.data_augmentation_angle, image_folder='images/snap_dk_250_64_64') # No image folder means loading from hdf5 file
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=num_workers, drop_last=True)
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch_size, num_workers=num_workers, drop_last=False, shuffle=False)
     print(train_dataset.image_size)
     # Instansiate model
     args.num_features = train_dataset.features.shape[1]+1
     args.image_size = [train_dataset.image_size[0], train_dataset.image_size[1]]
-    args.out_channels = [int(args.out_channels_l1), int(args.out_channels_l2), 10, 5, 5, 1]
-    args.kernel_size = [(int(args.kernel_size_l1),int(args.kernel_size_l1)), (3,3), (3,3), (3,3), (2,2), (2,2)]
+    args.out_channels = [int(args.out_channels_l1), int(args.out_channels_l2), 10, 1]
+    args.kernel_size = [(int(args.kernel_size_l1),int(args.kernel_size_l1)), (3,3), (3,3), (2,2)]
     args.nn_layers = [int(args.nn_layer_size), int(args.nn_layer_size)]
     args.channels = 1
 
@@ -94,7 +94,7 @@ def run(args):
     # Define loss function, optimizer and LR scheduler
     criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
-    scheduler_model = lr_scheduler.ReduceLROnPlateau(optimizer, patience=5)
+    scheduler_model = lr_scheduler.ReduceLROnPlateau(optimizer, patience=10)
 
     # Training loop
     train_loss = []

@@ -7,3 +7,4 @@ images/
 dortmund_images/
 *.zip
 *.pyc
+wandb/
