@@ -1,6 +1,6 @@
 import argparse
 import torch
-from dataset_factory import dataset_factory
+from dataset_factory_dortmund import dataset_factory
 from model import SkynetModel
 from torch import optim
 from torch import nn
@@ -20,13 +20,13 @@ def argparser():
     parser.add_argument('--seed', type=int, default=1, metavar='S',
                         help='random seed (default: 1)')
     parser.add_argument('--model-mode', type=str, default='full', help="Define the model mode, either 'full', 'images-only', 'features-only' or 'data-driven'")
-    parser.add_argument('--weight_decay', type=float, default=1e-5)
+    parser.add_argument('--weight_decay', type=float, default=0.005)
     parser.add_argument('--lr', type=float, default=1e-3)
     parser.add_argument('--no-data-augment',action='store_true', default=False,
                         help='disables data augmentation')
     parser.add_argument('--data_augmentation_angle',type=float, default=20)
-    parser.add_argument('--out_channels_l1', type=int, default=50)
-    parser.add_argument('--out_channels_l2', type=int, default=25)
+    parser.add_argument('--out_channels_l1', type=int, default=32)
+    parser.add_argument('--out_channels_l2', type=int, default=32)
     parser.add_argument('--offset-811', type=int, default=13)
     parser.add_argument('--offset-2630', type=int, default=-4)
     parser.add_argument('--nn_layer_size', type=int, default=128)
@@ -69,23 +69,24 @@ def run(args):
     num_workers = 4
     
     # Load data
-    train_dataset, test_dataset = dataset_factory(use_images=args.use_images, transform=transform, data_augment_angle=args.data_augmentation_angle, image_folder='images/snap_dk_250_64_64') # No image folder means loading from hdf5 file
+    #Wtrain_dataset, test_dataset = dataset_factory(use_images=args.use_images, transform=transform, data_augment_angle=args.data_augmentation_angle, image_folder='images/snap_dk_250_64_64') # No image folder means loading from hdf5 file
+    train_dataset, test_dataset = dataset_factory()
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=num_workers, drop_last=True)
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch_size, num_workers=num_workers, drop_last=False, shuffle=False)
     print(train_dataset.image_size)
     # Instansiate model
-    args.num_features = train_dataset.features.shape[1]+1
+    args.num_features = train_dataset.features.shape[1]+1 # Path loss model is an additional feature
     args.image_size = [train_dataset.image_size[0], train_dataset.image_size[1]]
     args.out_channels = [int(args.out_channels_l1), int(args.out_channels_l2), 10, 1]
     args.kernel_size = [(int(args.kernel_size_l1),int(args.kernel_size_l1)), (3,3), (3,3), (2,2)]
     args.nn_layers = [int(args.nn_layer_size), int(args.nn_layer_size)]
     args.channels = 1
 
-    rsrp_mu = train_dataset.target_mu
-    rsrp_std = train_dataset.target_std
+    #rsrp_mu = train_dataset.target_mu
+    #rsrp_std = train_dataset.target_std
    
 
-    model = SkynetModel(args, rsrp_mu = rsrp_mu, rsrp_std = rsrp_std)
+    model = SkynetModel(args, train_dataset.target_scaler,  test_dataset.target_scaler)
     if args.cuda:
         model.cuda()
     
@@ -103,16 +104,18 @@ def run(args):
         # Called by the loop
         trainloss = 0
         with tqdm(total = len(train_loader)) as pbar:
-            for idx, (feature, image, target, dist) in enumerate(train_loader):
+            for idx, (feature, image, target, dist_freq_offset) in enumerate(train_loader):
                 if args.cuda:
                     image = image.cuda()
                     feature = feature.cuda()
                     target = target.cuda()
-                    dist = dist.cuda()
+                    dist = dist_freq_offset[0].cuda()
+                    freq = dist_freq_offset[1].cuda()
+                    offset = dist_freq_offset[2].cuda()
 
                 optimizer.zero_grad()
 
-                output, sum_output = model(feature, image, dist)
+                output, sum_output = model(feature, image, dist, freq, offset)
 
                 loss = criterion(sum_output, target)
                 loss.backward()
@@ -129,14 +132,16 @@ def run(args):
         testloss = 0
         with torch.no_grad():
             with tqdm(total = len(test_loader)) as pbar:
-                for idx, (feature, image, target, dist) in enumerate(test_loader):
+                for idx, (feature, image, target, dist_freq_offset) in enumerate(test_loader):
                     if args.cuda:
                         image = image.cuda()
                         feature = feature.cuda()
                         target = target.cuda()
-                        dist = dist.cuda()
+                        dist = dist_freq_offset[0].cuda()
+                        freq = dist_freq_offset[1].cuda()
+                        offset = dist_freq_offset[2].cuda()
                     
-                    output, sum_output = model(feature, image, dist)
+                    output, sum_output = model(feature, image, dist, freq, offset)
 
                     loss = criterion(sum_output, target)
                     testloss += loss.item()
@@ -159,14 +164,14 @@ def run(args):
             break
 
 
-    exp = Experiment('file', config=args.__dict__, root_folder='exps/')
+    exp = Experiment('file', config=args.__dict__, root_folder='exps')
     results_dict = dict()
     results_dict['train_loss'] = train_loss
     results_dict['test_loss'] = test_loss
     exp.results = results_dict
     exp.save()
 
-    torch.save(model.state_dict(), exp.root_folder+'/models/{}_model_{:.3f}.pt'.format(exp.id,test_loss[-1]))
+    torch.save(model.state_dict(), exp.root_folder+'\\models\\{}_model_{:.3f}.pt'.format(exp.id,test_loss[-1]))
 
 
 

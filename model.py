@@ -71,7 +71,7 @@ class FeatureModel(nn.Module):
         return x
 
 class SkynetModel(nn.Module):
-    def __init__(self, args, **kwargs):
+    def __init__(self, args, train_scaler, test_scaler, **kwargs):
         super(SkynetModel, self).__init__()
 
         # Complete model. Consists of:
@@ -93,8 +93,10 @@ class SkynetModel(nn.Module):
         self.model_mode = args.model_mode
         self.nn_layers = args.nn_layers
 
-        self.rsrp_mu = torch.squeeze(torch.tensor(kwargs.get('rsrp_mu')).float())
-        self.rsrp_std = torch.squeeze(torch.tensor(kwargs.get('rsrp_std')).float())
+        self.train_scaler = train_scaler
+        self.test_scaler = test_scaler
+        #self.rsrp_mu = torch.squeeze(torch.tensor(kwargs.get('rsrp_mu')).float())
+        #self.rsrp_std = torch.squeeze(torch.tensor(kwargs.get('rsrp_std')).float())
         self.image_output_size = 100
 
 
@@ -124,9 +126,9 @@ class SkynetModel(nn.Module):
         else:
             self = self.cpu()
 
-    def forward(self, features, image, distance, **kwargs):
+    def forward(self, features, image, distance, frequency, offset, **kwargs):
        
-        P = self.predict_physicals_model(features, distance)
+        P = self.predict_physicals_model(features, distance, frequency, offset)
         P = P.detach()
 
         
@@ -164,8 +166,8 @@ class SkynetModel(nn.Module):
 
         return correction, sum_out
 
-    def predict_physicals_model(self, features, distance):
-        frequency, offset = self.get_constants(features, distance)
+    def predict_physicals_model(self, features, distance, frequency, offset):
+
         P = self.PhysicsModel(distance, frequency, offset=offset)
         if self.is_cuda:
             P = P.cuda()
@@ -187,6 +189,8 @@ class SkynetModel(nn.Module):
         """
         if self.cuda():
             distance = distance.cpu()
+            frequency = frequency.cpu()
+            offset = offset.cpu()
         loss = pathloss_38901(distance.numpy(), frequency.numpy())
         loss = torch.from_numpy(loss)
 
@@ -201,9 +205,14 @@ class SkynetModel(nn.Module):
         P_rsrp = P_rx - 10*torch.log10(12*N)
 
         # Normalize 
-        P_rsrp = (P_rsrp-self.rsrp_mu)/self.rsrp_std
+        if self.training:
 
-        return P_rsrp
+            P_rsrp = self.train_scaler.transform(P_rsrp.numpy())
+        else:
+            P_rsrp = self.test_scaler.transform(P_rsrp.numpy()) 
+        #P_rsrp = (P_rsrp-self.rsrp_mu)/self.rsrp_std
+
+        return torch.from_numpy(P_rsrp)
 
     def get_constants(self, features, distance):
         

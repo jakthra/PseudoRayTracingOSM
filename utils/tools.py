@@ -2,27 +2,6 @@ import math
 import pandas as pd
 import numpy as np
 
-def gps_distance(pos1, pos2):
-    # Positions given in WSG84 
-    from math import sin, cos, sqrt, atan2, radians
-
-    # approximate radius of earth in km
-    R = 6373.0
-    
-    lat1 = radians(pos1[0])
-    lon1 = radians(pos1[1])
-    
-    lat2 = radians(pos2[0])
-    lon2 = radians(pos2[1])
-    
-    dlon = lon2 - lon1
-    dlat = lat2 - lat1
-    
-    a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
-    c = 2 * atan2(sqrt(a), sqrt(1 - a))
-    
-    return R * c
-
 def generate_feature_matrix(raw_data, features):
     X_df = pd.DataFrame()
     if 'Longitude' in features:
@@ -125,3 +104,4 @@ def rotate_point(origio, degree, distance=0.05):
     lat2 = math.degrees(lat2)
     lon2 = math.degrees(lon2)
     return lat2, lon2
+

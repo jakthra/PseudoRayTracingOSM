@@ -22,9 +22,10 @@ def uma_nlos(d3d, d2d, dbp, fc, h_b, h_t):
 
 def pathloss_38901(distance, frequency, h_bs=30, h_ut=1.5):
     """
-        Simple path loss model for computing RSRP based on distance.
-        
-        fc: frequency in GHz
+        Simple path loss model 38901
+
+        distance: meters 
+        frequency: frequency in GHz
         h_b: height of basestation
         h_t: height of UT
     """

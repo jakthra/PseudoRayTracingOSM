@@ -9,6 +9,7 @@ from skimage import io, transform
 import os
 import matplotlib.pyplot as plt
 from utils.invert import Invert
+from pathloss_38901 import pathloss_38901
 
 def dataset_factory(use_images=True, image_folder="images/snap_dk_250_png", transform=True, data_augment_angle=10):
     #Longitude,Latitude,Speed,Distance,Distance_x,Distance_y,PCI_64,PCI_65,PCI_302	
