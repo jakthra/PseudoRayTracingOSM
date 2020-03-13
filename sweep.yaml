@@ -4,12 +4,8 @@ metric:
   name: test_loss
   goal: minimize
 parameters:
-  out_channels_l1:
+  nn_layer_size:
     values: [32, 64, 128]
-  out_channels_l2:
-    values: [12, 32, 64]  
-  kernel_size_l1:
-    values: [5, 8, 10]
   weight_decay:
     min: 0.00001
     max: 0.01
