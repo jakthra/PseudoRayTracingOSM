@@ -78,7 +78,7 @@ def run(args):
     args.num_features = train_dataset.features.shape[1]+1 # Path loss model is an additional feature
     args.image_size = [train_dataset.image_size[0], train_dataset.image_size[1]]
     args.out_channels = [int(args.out_channels_l1), int(args.out_channels_l2), 10, 1]
-    args.kernel_size = [(int(args.kernel_size_l1),int(args.kernel_size_l1)), (3,3), (3,3), (2,2)]
+    args.kernel_size = [(int(args.kernel_size_l1),int(argcs.kernel_size_l1)), (3,3), (3,3), (2,2)]
     args.nn_layers = [int(args.nn_layer_size), int(args.nn_layer_size)]
     args.channels = 1
 
@@ -86,7 +86,7 @@ def run(args):
     #rsrp_std = train_dataset.target_std
    
 
-    model = SkynetModel(args, train_dataset.target_scaler,  test_dataset.target_scaler)
+    model = SkynetModel(args, train_dataset.target_scaler)
     if args.cuda:
         model.cuda()
     

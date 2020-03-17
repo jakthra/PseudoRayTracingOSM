@@ -36,6 +36,7 @@ def generate_feature_output_matrix_dortmund(raw_csv):
     delta_lon = raw_csv['lon'] - raw_csv['cellLon']
 
     feature_matrix = pd.DataFrame()
+    feature_matrix['index'] = raw_csv['index']
     feature_matrix['lon'] = raw_csv['lon']
     feature_matrix['lat'] = raw_csv['lat']
     feature_matrix['speed'] = raw_csv['speed']
@@ -52,9 +53,6 @@ def generate_feature_output_matrix_dortmund(raw_csv):
     output_matrix['rsrp'] = raw_csv['rsrp']
     output_matrix['rsrq'] = raw_csv['rsrq']
 
-    # Remove nan
-    feature_matrix.dropna(inplace=True)
-    output_matrix.dropna(inplace=True)
 
 
     return feature_matrix, output_matrix
@@ -138,6 +136,7 @@ def dataset_factory(dortmund_images_path="dortmund_images\\campus_png\\tmobile\\
 
     # Load DTU dataset 
     dtu_input_df = pd.read_pickle('dataset\\processed\\dtu_feature.pkl').drop(['cell_lat', 'cell_lon','lat','lon'], axis=1)
+    dtu_index = np.arange(0,len(dtu_input_df))
     dtu_target_df = pd.read_pickle('dataset\\processed\\dtu_output.pkl').drop(['sinr', 'rsrq', 'rssi'],axis=1)
     dtu_input_df.sort_index(axis=1, inplace=True)
 
@@ -178,33 +177,44 @@ def dataset_factory(dortmund_images_path="dortmund_images\\campus_png\\tmobile\\
     # plt.show()
 
 
-    # Load Dortmund dataset
-    dortmund_input_df = pd.read_pickle('dataset\\processed\\dortmund_feature_tmobile_campus.pkl').drop(['alt', 'cell_lat', 'cell_lon','lat','lon'],axis=1)
-    dortmund_target_df = pd.read_pickle('dataset\\processed\\dortmund_output_tmobile_campus.pkl').drop(['sinr', 'rsrq'],axis=1)
-    dortmund_input_df.sort_index(axis=1, inplace=True)
-
-    
-    dortmund_offset = np.zeros((len(dortmund_input_df), ))
-    for group in dortmund_input_df.groupby(['cell_freq']):
-        cell_freq = group[0]
-        idx = np.where(dortmund_input_df['cell_freq'] == cell_freq)
-        offset = optimize_link_budget(dortmund_input_df.loc[idx], dortmund_target_df.loc[idx])
-        dortmund_offset[idx] = offset.x
-
-    print(dortmund_input_df.head())
-    print(dortmund_target_df.head())
-
     # Setup normalization using training data
     input_scaler = StandardScaler().fit(dtu_input_df)
     target_scaler_dtu = StandardScaler().fit(dtu_target_df)
-    target_scaler_dortmund = StandardScaler().fit(dortmund_target_df)
 
     # Setup image transformation
     composed = transforms.Compose([transforms.ToPILImage(),  transforms.Grayscale(), Invert(), transforms.RandomAffine(data_augmentation_angle, shear=10), transforms.ToTensor()])
 
+    # Load Dortmund dataset
+    dortmund_dataset_names = ['campus', 'urban', 'suburban', 'highway']
+    dortmund_datasets = {}
+    for dortmund_data in dortmund_dataset_names:
+        dortmund_input_df = pd.read_pickle('dataset\\processed\\dortmund_feature_tmobile_{}.pkl'.format(dortmund_data)).drop(['alt', 'cell_lat', 'cell_lon','lat','lon'],axis=1)
+        dortmund_index = dortmund_input_df['index']
+        dortmund_input_df.drop(['index'], axis=1, inplace=True)
+
+        dortmund_target_df = pd.read_pickle('dataset\\processed\\dortmund_output_tmobile_{}.pkl'.format(dortmund_data)).drop(['sinr', 'rsrq'],axis=1)
+        dortmund_input_df.sort_index(axis=1, inplace=True)
+
+        
+        dortmund_offset = np.zeros((len(dortmund_input_df), ))
+        for group in dortmund_input_df.groupby(['cell_freq']):
+            cell_freq = group[0]
+            idx = np.where(dortmund_input_df['cell_freq'] == cell_freq)
+            offset = optimize_link_budget(dortmund_input_df.loc[idx], dortmund_target_df.loc[idx])
+            dortmund_offset[idx] = offset.x
+
+        print(dortmund_input_df.head())
+        print(dortmund_target_df.head())
+        dortmund_images_path = "dortmund_images\\{}_png\\tmobile\\".format(dortmund_data)
+        test_dataset = DrivetestDataset(dortmund_input_df, dortmund_target_df, dortmund_images_path, composed, input_scaler, target_scaler_dtu, dortmund_offset, dortmund_index)
+        dortmund_datasets[dortmund_data] = test_dataset
+
+   
+
+
+
     # Create generators for test and training data
-    train_dataset = DrivetestDataset(dtu_input_df, dtu_target_df, dtu_images_path, composed, input_scaler, target_scaler_dtu, dtu_offset)
-    test_dataset = DrivetestDataset(dortmund_input_df, dortmund_target_df, dortmund_images_path, composed, input_scaler, target_scaler_dortmund, dortmund_offset)
+    train_dataset = DrivetestDataset(dtu_input_df, dtu_target_df, dtu_images_path, composed, input_scaler, target_scaler_dtu, dtu_offset, dtu_index)
 
     # Test output of training and test generators
 
@@ -220,13 +230,16 @@ def dataset_factory(dortmund_images_path="dortmund_images\\campus_png\\tmobile\\
     # print(y.shape)
     # print(dist_and_freq)
 
-    return train_dataset, test_dataset
+    return train_dataset, dortmund_datasets
 
 class DrivetestDataset(Dataset):
-    def __init__(self, features, targets, image_folder, transform, input_scaler, target_scaler, offset):
+    def __init__(self, features, targets, image_folder, transform, input_scaler, target_scaler, offset, index):
         
         self.offset = offset
-
+        try:
+            self.index = index.to_numpy()
+        except: 
+            self.index = index
         self.targets = targets.to_numpy()
         self.features = features.to_numpy()
         self.distances = features['distance']*1000
@@ -245,9 +258,10 @@ class DrivetestDataset(Dataset):
         return np.argwhere(np.asarray(self.features['cell_freq'] == 2630))
 
     def __getitem__(self, index):
+        img_idx = self.index[index]
         X_norm = self.input_scaler.transform(self.features[index].reshape(1, -1))
         X = torch.from_numpy(X_norm).float().squeeze()  # Features (normalized)
-        img_name = os.path.join(self.image_folder, "{}.png".format(index))
+        img_name = os.path.join(self.image_folder, "{}.png".format(img_idx))
         image = io.imread(img_name)
         image = image / 255
         A = torch.from_numpy(image).float().permute(2,0,1)
@@ -267,7 +281,7 @@ class DrivetestDataset(Dataset):
         return X, A, y, [dist, freq, offset]
 
     def __len__(self):
-        return len(self.features)
+        return len(self.index)
 
 
 

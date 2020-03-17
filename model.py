@@ -71,7 +71,7 @@ class FeatureModel(nn.Module):
         return x
 
 class SkynetModel(nn.Module):
-    def __init__(self, args, train_scaler, test_scaler, **kwargs):
+    def __init__(self, args, train_scaler, **kwargs):
         super(SkynetModel, self).__init__()
 
         # Complete model. Consists of:
@@ -87,16 +87,12 @@ class SkynetModel(nn.Module):
         out_channels = args.out_channels
         kernel_size = args.kernel_size
         self.is_cuda = args.cuda
-        self.offset_811 = args.offset_811
-        self.offset_2630 = args.offset_2630
-
         self.model_mode = args.model_mode
         self.nn_layers = args.nn_layers
 
         self.train_scaler = train_scaler
-        self.test_scaler = test_scaler
-        #self.rsrp_mu = torch.squeeze(torch.tensor(kwargs.get('rsrp_mu')).float())
-        #self.rsrp_std = torch.squeeze(torch.tensor(kwargs.get('rsrp_std')).float())
+
+
         self.image_output_size = 100
 
 
@@ -205,12 +201,7 @@ class SkynetModel(nn.Module):
         P_rsrp = P_rx - 10*torch.log10(12*N)
 
         # Normalize 
-        if self.training:
-
-            P_rsrp = self.train_scaler.transform(P_rsrp.numpy())
-        else:
-            P_rsrp = self.test_scaler.transform(P_rsrp.numpy()) 
-        #P_rsrp = (P_rsrp-self.rsrp_mu)/self.rsrp_std
+        P_rsrp = self.train_scaler.transform(P_rsrp.numpy())
 
         return torch.from_numpy(P_rsrp)
 
