@@ -1,4 +1,4 @@
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, ConcatDataset
 from torchvision import transforms
 from numpy import genfromtxt
 import numpy as np
@@ -186,35 +186,40 @@ def dataset_factory(dortmund_images_path="dortmund_images\\campus_png\\tmobile\\
 
     # Load Dortmund dataset
     dortmund_dataset_names = ['campus', 'urban', 'suburban', 'highway']
+    mnos = ['tmobile', 'o2', 'vodafone']
     dortmund_datasets = {}
+    
     for dortmund_data in dortmund_dataset_names:
-        dortmund_input_df = pd.read_pickle('dataset\\processed\\dortmund_feature_tmobile_{}.pkl'.format(dortmund_data)).drop(['alt', 'cell_lat', 'cell_lon','lat','lon'],axis=1)
-        dortmund_index = dortmund_input_df['index']
-        dortmund_input_df.drop(['index'], axis=1, inplace=True)
+        mno_datasets = {}
+        mno_datasets_list = [] 
+        for mno in mnos:
 
-        dortmund_target_df = pd.read_pickle('dataset\\processed\\dortmund_output_tmobile_{}.pkl'.format(dortmund_data)).drop(['sinr', 'rsrq'],axis=1)
-        dortmund_input_df.sort_index(axis=1, inplace=True)
+            dortmund_input_df = pd.read_pickle('dataset\\processed\\dortmund_feature_{}_{}.pkl'.format(mno, dortmund_data)).drop(['alt', 'cell_lat', 'cell_lon','lat','lon'],axis=1)
+            dortmund_index = dortmund_input_df['index']
+            dortmund_input_df.drop(['index'], axis=1, inplace=True)
+
+            dortmund_target_df = pd.read_pickle('dataset\\processed\\dortmund_output_{}_{}.pkl'.format(mno, dortmund_data)).drop(['sinr', 'rsrq'],axis=1)
+            dortmund_input_df.sort_index(axis=1, inplace=True)
 
         
-        dortmund_offset = np.zeros((len(dortmund_input_df), ))
-        for group in dortmund_input_df.groupby(['cell_freq']):
-            cell_freq = group[0]
-            idx = np.where(dortmund_input_df['cell_freq'] == cell_freq)
-            offset = optimize_link_budget(dortmund_input_df.loc[idx], dortmund_target_df.loc[idx])
-            dortmund_offset[idx] = offset.x
+            dortmund_offset = np.zeros((len(dortmund_input_df), ))
+            for group in dortmund_input_df.groupby(['cell_freq']):
+                cell_freq = group[0]
+                idx = np.where(dortmund_input_df['cell_freq'] == cell_freq)
+                offset = optimize_link_budget(dortmund_input_df.loc[idx], dortmund_target_df.loc[idx])
+                dortmund_offset[idx] = offset.x
 
-        print(dortmund_input_df.head())
-        print(dortmund_target_df.head())
-        dortmund_images_path = "dortmund_images\\{}_png\\tmobile\\".format(dortmund_data)
-        test_dataset = DrivetestDataset(dortmund_input_df, dortmund_target_df, dortmund_images_path, composed, input_scaler, target_scaler_dtu, dortmund_offset, dortmund_index)
-        dortmund_datasets[dortmund_data] = test_dataset
+            print(dortmund_input_df.head())
+            print(dortmund_target_df.head())
+            dortmund_images_path = "dortmund_images\\{}_png\\{}\\".format(dortmund_data, mno)
+            test_dataset = DrivetestDataset(dortmund_input_df, dortmund_target_df, dortmund_images_path, composed, input_scaler, target_scaler_dtu, dortmund_offset, dortmund_index)
+            mno_datasets[mno] = test_dataset
+            mno_datasets_list.append(test_dataset)
+        dortmund_datasets[dortmund_data] = ConcatDataset(mno_datasets_list)
 
    
-
-
-
     # Create generators for test and training data
-    train_dataset = DrivetestDataset(dtu_input_df, dtu_target_df, dtu_images_path, composed, input_scaler, target_scaler_dtu, dtu_offset, dtu_index)
+    dtu_dataset = DrivetestDataset(dtu_input_df, dtu_target_df, dtu_images_path, composed, input_scaler, target_scaler_dtu, dtu_offset, dtu_index)
 
     # Test output of training and test generators
 
@@ -230,7 +235,7 @@ def dataset_factory(dortmund_images_path="dortmund_images\\campus_png\\tmobile\\
     # print(y.shape)
     # print(dist_and_freq)
 
-    return train_dataset, dortmund_datasets
+    return dtu_dataset, dortmund_datasets
 
 class DrivetestDataset(Dataset):
     def __init__(self, features, targets, image_folder, transform, input_scaler, target_scaler, offset, index):
