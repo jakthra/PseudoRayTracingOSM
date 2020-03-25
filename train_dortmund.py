@@ -35,7 +35,7 @@ def argparser():
     parser.add_argument('--offset-2630', type=int, default=-4)
     parser.add_argument('--nn_layer_size', type=int, default=32)
     parser.add_argument('--kernel_size_l1', type=int, default=5)
-    parser.add_argument('--test_scenario', type=str, default='highway')
+    parser.add_argument('--test_scenario', type=str, default='DK')
     
     args = parser.parse_args()
     return args
@@ -50,10 +50,12 @@ def run(args):
     if args.cuda:
         torch.cuda.empty_cache()
 
-    torch.manual_seed(args.seed)
+    #torch.manual_seed(args.seed)
     if args.cuda:
         print('CUDA enabled')
-        torch.cuda.manual_seed(args.seed)
+    
+    
+    #    torch.cuda.manual_seed(args.seed)
 
 
     
@@ -75,61 +77,9 @@ def run(args):
     
     # Load data
     #Wtrain_dataset, test_dataset = dataset_factory(use_images=args.use_images, transform=transform, data_augment_angle=args.data_augmentation_angle, image_folder='images/snap_dk_250_64_64') # No image folder means loading from hdf5 file
-    dtu_dataset, dortmund_dataset = dataset_factory()
-
-    all_datasets = dict()
-    all_datasets = dortmund_dataset
-    all_datasets['DK'] = dtu_dataset
-    train_dataset = []
-
-    
+    train_dataset, test_dataset = dataset_factory(args)
 
 
-    for key, value in all_datasets.items():
-        if key == args.test_scenario:
-            test_dataset = value
-        else:
-            
-            try:
-                for dataset in value.datasets:
-                    train_dataset.append(dataset)
-                    try: 
-                        features = np.concatenate([features, dataset.features], axis=0)
-                    except:
-                        features = dataset.features
-
-                    try: 
-                        targets = np.concatenate([targets, dataset.targets], axis=0)
-                    except:
-                        targets = dataset.targets
-            except:
-                train_dataset.append(value)
-                try: 
-                    features = np.concatenate([features, value.features], axis=0)
-                except:
-                    features = value.features
-
-                try: 
-                    targets = np.concatenate([targets, value.targets], axis=0)
-                except:
-                    targets = dataset.targets
-           
-            print(features.shape)
-
-    # Fit scalers
-    input_scaler = StandardScaler().fit(features)
-    target_scaler = StandardScaler().fit(targets)
-
-    # Overwrite scalers for all datasets
-    for dataset in train_dataset:
-        dataset.input_scaler = input_scaler
-        dataset.target_scaler = target_scaler
-
-    for dataset in test_dataset.datasets:
-        dataset.input_scaler = input_scaler
-        dataset.target_scaler = target_scaler
-
-    train_datasets_concat = ConcatDataset(train_dataset)
 
     train_loader = torch.utils.data.DataLoader(train_datasets_concat, batch_size=args.batch_size, shuffle=True, num_workers=num_workers, drop_last=True)
 

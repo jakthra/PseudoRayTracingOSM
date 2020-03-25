@@ -28,6 +28,7 @@ def argparser():
                         help='random seed (default: 1)')
     parser.add_argument('--name', type=str, help='Name of experiment/model to load', default="277e981b-7099-41e2-8d78-74dd608ca40d")
     parser.add_argument('--exp-folder', type=str, default='exps')
+    parser.add_argument('--test_scenario', type=str, default='DK')
     args = parser.parse_args()
     return args
 
@@ -60,13 +61,13 @@ def run(args):
     args.cuda = cuda
 
     
-    dtu_dataset, dortmund_dataset = dataset_factory()
-    train_loader = torch.utils.data.DataLoader(dtu_dataset, batch_size=args.batch_size, shuffle=False, drop_last=False)
+    train_dataset, test_dataset = dataset_factory(args)
+    #train_loader = torch.utils.data.DataLoader(dtu_dataset, batch_size=args.batch_size, shuffle=False, drop_last=False)
 
 
-   
+    target_scaler = train_dataset.datasets[0].target_scaler
 
-    model = SkynetModel(args, dtu_dataset.target_scaler)
+    model = SkynetModel(args, target_scaler)
  
     if args.cuda:
         model.cuda()
@@ -128,33 +129,15 @@ def run(args):
 
         return sum_output, MSE, RMSE
 
-    RMSE = {}
-    MSE = {}
-
-    for scenariokey, dataset in dortmund_dataset.items(): # Campus, urban, suburban, highway
-        MSE_ = list()
-        RMSE_ = list()
-        #for mnokey, dataset in scenario.items(): # o2, vodafone, tmoible
-            
-
-        test_loader = torch.utils.data.DataLoader(dataset, batch_size=args.batch_size, drop_last=False, shuffle=False) 
-        sum_output, MSE__, RMSE__ = evaluate_dataset(test_loader,  dtu_dataset.target_scaler, args)
-        MSE_ = MSE__
-        RMSE_= RMSE__
-
-        MSE[scenariokey] = MSE_
-        RMSE[scenariokey] = RMSE_
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch_size, drop_last=False, shuffle=False) 
+    sum_output, MSE__, RMSE__ = evaluate_dataset(test_loader,  target_scaler, args)
+    print(RMSE__)
     
-
-    
-    RMSE_arr = []
-    for key in RMSE:
-        RMSE_arr.append(pd.Series(RMSE[key], name=key))
 
     fig = plt.figure()
     ax = plt.subplot(111)
     sns.set(style='darkgrid')
-    sns.boxplot(data=RMSE_arr, width=0.5, ax=ax)
+    sns.boxplot(data=RMSE__, width=0.5, ax=ax)
     ax.set_xlabel("Scenarios")
     ax.set_ylabel("RMSE [dB]")
     plt.xticks(plt.xticks()[0], RMSE.keys())

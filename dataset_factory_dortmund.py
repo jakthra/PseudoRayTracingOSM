@@ -129,7 +129,7 @@ def process_datasets():
 
     # Everything saved as .pkl
 
-def dataset_factory(dortmund_images_path="dortmund_images\\campus_png\\tmobile\\", dtu_images_path="images\\snap_dk_250_64_64\\", data_augmentation_angle=20):
+def dataset_factory(args, dortmund_images_path="dortmund_images\\campus_png\\tmobile\\", dtu_images_path="images\\snap_dk_250_64_64\\", data_augmentation_angle=20):
 
     # Training set to consist of entire DTU dataset
     # Test set to consist of entire Dortmund dataset
@@ -235,7 +235,72 @@ def dataset_factory(dortmund_images_path="dortmund_images\\campus_png\\tmobile\\
     # print(y.shape)
     # print(dist_and_freq)
 
-    return dtu_dataset, dortmund_datasets
+
+    all_datasets = dict()
+    all_datasets = dortmund_datasets
+    all_datasets['DK'] = dtu_dataset
+    train_dataset = []
+
+    
+
+
+    for key, value in all_datasets.items():
+        if key == args.test_scenario:
+            test_dataset = value
+        else:
+            
+            try:
+                for dataset in value.datasets:
+                    train_dataset.append(dataset)
+                    try: 
+                        features = np.concatenate([features, dataset.features], axis=0)
+                    except:
+                        features = dataset.features
+
+                    try: 
+                        targets = np.concatenate([targets, dataset.targets], axis=0)
+                    except:
+                        targets = dataset.targets
+            except:
+                train_dataset.append(value)
+                try: 
+                    features = np.concatenate([features, value.features], axis=0)
+                except:
+                    features = value.features
+
+                try: 
+                    targets = np.concatenate([targets, value.targets], axis=0)
+                except:
+                    targets = dataset.targets
+           
+            
+
+    # Fit scalers
+    input_scaler = StandardScaler().fit(features)
+    target_scaler = StandardScaler().fit(targets)
+
+    # Overwrite scalers for all datasets
+    print("+++++ Training Datasets: ++++++")
+    for dataset in train_dataset:
+        print("Image path: {}".format(dataset.image_folder))
+        dataset.input_scaler = input_scaler
+        dataset.target_scaler = target_scaler
+    print("+++++ Test Datasets: ++++++")
+
+    if args.test_scenario == 'DK':
+        print("Image path: {}".format(test_dataset.image_folder))
+        test_dataset.input_scaler = input_scaler
+        test_dataset.target_scaler = target_scaler
+    else:
+        for dataset in test_dataset.datasets:
+            print("Image path: {}".format(dataset.image_folder))
+            dataset.input_scaler = input_scaler
+            dataset.target_scaler = target_scaler
+
+    train_datasets_concat = ConcatDataset(train_dataset)
+
+
+    return train_datasets_concat, test_dataset
 
 class DrivetestDataset(Dataset):
     def __init__(self, features, targets, image_folder, transform, input_scaler, target_scaler, offset, index):
