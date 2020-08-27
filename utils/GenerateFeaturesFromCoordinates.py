@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from pyproj import Geod
 
 class GenerateFeaturesFromCoordinates:
 
@@ -9,6 +10,9 @@ class GenerateFeaturesFromCoordinates:
 
         # Load csv of positions
         self.coordinates = self._load_coordinates()
+
+        # TODO: Get speed
+        self.speed = 30
 
         # TODO: ASsert bs_info
         # 
@@ -99,6 +103,9 @@ class GenerateFeaturesFromCoordinates:
         
         # Compute delta_lat, delta_lon, add to df
         feature_df['delta_lat'], feature_df['delta_lon'] = self._compute_delta_positions(feature_df)
+
+        # Add speed
+        feature_df['speed'] = self.speed
 
         # Return dataframe
         return feature_df
