@@ -15,6 +15,7 @@ from scipy.optimize import minimize
 from pathloss_38901 import pathloss_38901
 import matplotlib.pyplot as plt
 
+
 def generate_feature_output_matrix_dortmund(raw_csv):
     # Assume csv file consists of #index,lon,lat,speed,sinr,rsrp,rsrq,cellLon,cellLat
 
