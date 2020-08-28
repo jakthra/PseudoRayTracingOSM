@@ -183,7 +183,7 @@ class SkynetModel(nn.Module):
             L(d) = P_tx - loss(d) + offset        
 
         """
-        if self.cuda():
+        if self.is_cuda:
             distance = distance.cpu()
             frequency = frequency.cpu()
             offset = offset.cpu()

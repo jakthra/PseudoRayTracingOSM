@@ -9,10 +9,10 @@ import torch
 
 # Load new positions and generate features
 bs_info_103068 = {'cell_lat': 51.489010, 'cell_lon': 7.403921, 'cell_freq': 1800}
-features_103068 = GenerateFeaturesFromCoordinates('dataset\\103068.csv', bs_info_103068).get_features_df()
+features_103068 = GenerateFeaturesFromCoordinates('dataset\\103068.csv', bs_info_103068).get_features_df().drop(['cell_lat', 'cell_lon','lat','lon'],axis=1)
 
 bs_info_114809 = {'cell_lat': 51.492758, 'cell_lon': 7.412209, 'cell_freq': 1800}
-features_114809 = GenerateFeaturesFromCoordinates('dataset\\103068.csv', bs_info_114809).get_features_df()
+features_114809 = GenerateFeaturesFromCoordinates('dataset\\103068.csv', bs_info_114809).get_features_df().drop(['cell_lat', 'cell_lon','lat','lon'],axis=1)
 
 # Load input and target scalers
 dortmund_dataset_names = ['campus', 'urban', 'suburban', 'highway']
@@ -42,8 +42,8 @@ input_scaler = StandardScaler().fit(all_german_features)
 target_scaler = StandardScaler().fit(all_german_targets)
 
 # Create pytorch dataset
-dataset_103068 = DriveTestPredictionSet(features_103068, features_103068['index'].to_numpy(),"dataset/images/103068_png/", input_scaler)
-dataset_114809 = DriveTestPredictionSet(features_114809, features_114809['index'].to_numpy(),"dataset/images/114809_png/", input_scaler)
+dataset_103068 = DriveTestPredictionSet(features_103068.drop('index',axis=1), features_103068['index'].to_numpy(),"dataset/images/103068_png/", input_scaler)
+dataset_114809 = DriveTestPredictionSet(features_114809.drop('index',axis=1), features_114809['index'].to_numpy(),"dataset/images/114809_png/", input_scaler)
 
 # load model
 exp_root_path = "exps/"
@@ -56,10 +56,37 @@ model.load_state_dict(torch.load('exps/models/6823d387-c934-40eb-81f3-afd34baa96
 model.eval()
 
 # Predict using stored model
+def evaluate_dataset(dataset_loader):
+    with torch.no_grad():
+        MSE = np.zeros((len(dataset_loader),))
+        RMSE = np.zeros((len(dataset_loader),))
+        for idx, (feature, image, target, dist_freq_offset) in enumerate(dataset_loader):
+            dist = dist_freq_offset[0]
+            freq = dist_freq_offset[1]
+            offset = dist_freq_offset[2]
+            correction_, sum_output_ = model(feature, image, dist, freq, offset)
+            print(sum_output_)
+            #P  = model.predict_physicals_model(feature, dist, freq, offset)
+            
+            #unnorm_predicted = scaler.inverse_transform(sum_output_.cpu().numpy())
 
-# Scale output values using target scalers
+            try:
+                sum_output = torch.cat([sum_output, sum_output_],0)
+            except:
+                sum_output = sum_output_
+    return sum_output
 
-# Store prediction in .csv
+test_loader = torch.utils.data.DataLoader(dataset_103068, batch_size=1, drop_last=False, shuffle=False) 
+sum_output = evaluate_dataset(test_loader)
+unnorm_predicted = target_scaler.inverse_transform(sum_output.cpu().numpy())
+
+np.savetxt('predictions/103068_rsrp.csv',unnorm_predicted, delimiter=',')
+
+test_loader = torch.utils.data.DataLoader(dataset_114809, batch_size=1, drop_last=False, shuffle=False) 
+sum_output = evaluate_dataset(test_loader)
+unnorm_predicted = target_scaler.inverse_transform(sum_output.cpu().numpy())
+
+np.savetxt('predictions/114809_rsrp.csv',unnorm_predicted, delimiter=',')
 
 
 

@@ -40,7 +40,7 @@ class DriveTestPredictionSet(Dataset):
 
         A = self.transform(A)
 
-        return X, A, y, [dist, freq, 0]
+        return X, A, 0, [dist, freq, 0]
 
     def __len__(self):
         return len(self.index)
