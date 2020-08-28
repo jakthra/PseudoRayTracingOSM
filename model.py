@@ -86,7 +86,7 @@ class SkynetModel(nn.Module):
         image_size = args.image_size
         out_channels = args.out_channels
         kernel_size = args.kernel_size
-        self.is_cuda = args.cuda
+        self.is_cuda = args.is_cuda
         self.model_mode = args.model_mode
         self.nn_layers = args.nn_layers
 
@@ -116,11 +116,11 @@ class SkynetModel(nn.Module):
         self.nn2.append(nn.ReLU())
         self.nn2.append(nn.BatchNorm1d(16))
         self.nn2.append(nn.Linear(16, 1))
-
-        if self.cuda:
-            self = self.cuda()
-        else:
-            self = self.cpu()
+        # print(self.cuda())
+        # if self.cuda:
+        #     self = self.cuda()
+        # else:
+        self = self.cpu()
 
     def forward(self, features, image, distance, frequency, offset, **kwargs):
        
