@@ -2,9 +2,12 @@
 import torch
 from skimage import io, transform
 from torchvision import transforms
+from .invert import Invert
+from torch.utils.data import Dataset
+import os
 
 class DriveTestPredictionSet(Dataset):
-    def __init__(self, features, image_folder, input_scaler):
+    def __init__(self, features, index, image_folder, input_scaler):
         
         try:
             self.index = index.to_numpy()
@@ -17,7 +20,7 @@ class DriveTestPredictionSet(Dataset):
         
         self.image_folder = image_folder
         self.input_scaler = input_scaler
-        self.image_size = io.imread(os.path.join(self.image_folder, "{}.png".format(0))).shape
+        self.image_size = io.imread(os.path.join(self.image_folder, "{}.png".format(self.index[0]))).shape
         self.transform = transforms.Compose([transforms.ToPILImage(),  transforms.Grayscale(), Invert(), transforms.ToTensor()])
 
     def __getitem__(self, index):
